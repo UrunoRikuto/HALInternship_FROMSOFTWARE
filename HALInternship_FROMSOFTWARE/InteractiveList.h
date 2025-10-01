@@ -40,6 +40,9 @@ public:
 	// @brief コンストラクタ
 	InteractiveIterator(Node* node) : m_pCurrent(node) {}
 
+	// @brief コピーコンストラクタ
+	InteractiveIterator(const Self& other) : m_pCurrent(other.m_pCurrent) {}
+
 	// @brief 前置インクリメント
 	Self& operator++() {
 		if (m_pCurrent) m_pCurrent = m_pCurrent->m_pNextData;
