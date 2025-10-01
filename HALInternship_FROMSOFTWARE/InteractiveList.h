@@ -44,49 +44,51 @@ public:
 	using Node = InteractiveNode<T>;
 	using Self = InteractiveIterator<T>;
 
+	// @brief コンストラクタ
 	InteractiveIterator(Node* node) : m_Current(node) {}
 
-	// 前置インクリメント
+	// @brief 前置インクリメント
 	Self& operator++() {
 		if (m_Current) m_Current = m_Current->m_pNextData;
 		return *this;
 	}
 
-	// 後置インクリメント
+	// @brief 後置インクリメント
 	Self operator++(int) {
 		Self temp = *this;
 		++(*this);
 		return temp;
 	}
 
-	// 前置デクリメント
+	// @brief 前置デクリメント
 	Self& operator--() {
 		if (m_Current) m_Current = m_Current->m_pPrevData;
 		return *this;
 	}
 
-	// 後置デクリメント
+	// @brief 後置デクリメント
 	Self operator--(int) {
 		Self temp = *this;
 		--(*this);
 		return temp;
 	}
 
-	// データへの参照
+	// @brief データへの参照
 	T& operator*() const {
 		return m_Current->m_Data;
 	}
 
-	// ポインタアクセス
+	// @brief ポインタアクセス
 	T* operator->() const {
 		return &(m_Current->m_Data);
 	}
 
-	// 比較演算子
+	// @brief 比較演算子
 	bool operator==(const Self& other) const {
 		return m_Current == other.m_Current;
 	}
 
+	// @brief 不等比較演算子
 	bool operator!=(const Self& other) const {
 		return !(*this == other);
 	}
@@ -238,7 +240,6 @@ public:
 	Iterator end() { return Iterator(nullptr); }
 	Iterator rbegin() { return Iterator(m_pTail); }
 	Iterator rend() { return Iterator(nullptr); }
-
 
 private:
 	// @brief 先頭のデータ

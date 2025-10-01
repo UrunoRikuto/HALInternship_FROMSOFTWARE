@@ -60,6 +60,7 @@ bool LoadFile(const std::string& In_FileName, InteractiveList<T>& Out_List) {
 		else {
 			// 対応していない型の場合ファイルを閉じる
 			inputFile.close();
+			// 処理失敗
 			return false;
 		}
 	}
@@ -67,5 +68,6 @@ bool LoadFile(const std::string& In_FileName, InteractiveList<T>& Out_List) {
 	// ファイルを閉じる
 	inputFile.close();
 
+	// 処理成功
 	return true;
 }
