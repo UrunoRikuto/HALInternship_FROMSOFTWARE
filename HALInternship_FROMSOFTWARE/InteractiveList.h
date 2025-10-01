@@ -7,15 +7,11 @@
 
 #pragma once
 
-/// <summary>
-/// 双方向リストのデータクラス
-/// </summary>
-/// <typeparam name="T">保存するデータの型</typeparam>
+// @brief 双方向リストのデータクラス
+// @typeparam T 保存するデータの型
 template<typename T>
-class InteractiveNode
+struct InteractiveNode
 {
-	// 関数
-public:
 	// @brief コンストラクタ
 	InteractiveNode(const T& In_Value)
 		:m_Data(In_Value)
@@ -24,8 +20,6 @@ public:
 	{
 	}
 
-	// 変数
-public:
 	// @brief データ
 	T m_Data;
 	// @brief 前のデータ
@@ -34,9 +28,8 @@ public:
 	InteractiveNode* m_pNextData;
 };
 
-/// <summary>
-/// 双方向リスト用イテレーター
-/// </summary>
+// @brief 双方向リスト用イテレーター
+// @typeparam T 保存するデータの型
 template<typename T>
 class InteractiveIterator 
 {
@@ -45,11 +38,11 @@ public:
 	using Self = InteractiveIterator<T>;
 
 	// @brief コンストラクタ
-	InteractiveIterator(Node* node) : m_Current(node) {}
+	InteractiveIterator(Node* node) : m_pCurrent(node) {}
 
 	// @brief 前置インクリメント
 	Self& operator++() {
-		if (m_Current) m_Current = m_Current->m_pNextData;
+		if (m_pCurrent) m_pCurrent = m_pCurrent->m_pNextData;
 		return *this;
 	}
 
@@ -62,7 +55,7 @@ public:
 
 	// @brief 前置デクリメント
 	Self& operator--() {
-		if (m_Current) m_Current = m_Current->m_pPrevData;
+		if (m_pCurrent) m_pCurrent = m_pCurrent->m_pPrevData;
 		return *this;
 	}
 
@@ -73,35 +66,41 @@ public:
 		return temp;
 	}
 
-	// @brief データへの参照
-	T& operator*() const {
-		return m_Current->m_Data;
+	// @brief データへの参照(const版)
+	const T& operator*() {
+		return m_pCurrent->m_Data;
+	}
+
+	// @brief 代入演算子
+	Self& operator=(const Self& other) {
+		if (this != &other) {
+			m_pCurrent = other.m_pCurrent;
+		}
+		return *this;
 	}
 
 	// @brief ポインタアクセス
-	T* operator->() const {
-		return &(m_Current->m_Data);
+	const T* operator->() {
+		return &(m_pCurrent->m_Data);
 	}
 
 	// @brief 比較演算子
-	bool operator==(const Self& other) const {
-		return m_Current == other.m_Current;
+	const bool operator==(const Self& other) {
+		return m_pCurrent == other.m_pCurrent;
 	}
 
 	// @brief 不等比較演算子
-	bool operator!=(const Self& other) const {
+	const bool operator!=(const Self& other) {
 		return !(*this == other);
 	}
 
 private:
-	Node* m_Current;
+	Node* m_pCurrent;
 
 };
 
-/// <summary>
-/// 双方向リストクラス
-/// </summary>
-/// <typeparam name="T">リストに保存する型</typeparam>
+// @brief 双方向リストクラス
+// @typeparam T 保存するデータの型
 template<typename T>
 class InteractiveList
 {
@@ -115,30 +114,30 @@ public:
 	}
 
 	// @brief デストラクタ
-	~InteractiveList() { Clear(); }
+	~InteractiveList() { clear(); }
 
 	// @brief リストのデータの総数を取得
 	// @return データの総数
-	const size_t GetListSize() { return m_Size; }
+	const size_t getSize() { return m_Size; }
 
 	// @brief リストが空かどうかを取得
-	const bool IsEmpty() { return m_Size == 0; }
-
-	// @brief 先頭データを取得
-	// @return 先頭データ
-	const InteractiveNode<T>* GetFront() { return m_pHead; }
-
-	// @brief 末尾データを取得
-	// @return 末尾データ
-	const InteractiveNode<T>* GetBack() { return m_pTail; }
+	const bool isEmpty() { return m_Size == 0; }
 
 	// @brief リストをクリア
-	void Clear() {
+	void clear() {
 		// データがなくなるまで先頭のデータを削除
-		while (!IsEmpty()) {
+		while (!isEmpty()) {
 			popFront();
 		}
 	}
+
+	// @brief 先頭データを取得
+	// @return 先頭データ
+	const InteractiveNode<T>* getFront() { return m_pHead; }
+
+	// @brief 末尾データを取得
+	// @return 末尾データ
+	const InteractiveNode<T>* getBack() { return m_pTail; }
 
 	// @brief 先頭にデータを追加
 	// @param In_Value 追加するデータ
@@ -146,7 +145,7 @@ public:
 		// 新しいノードを作成
 		InteractiveNode<T>* newNode = new InteractiveNode<T>(In_Value);
 		// リストが空の場合
-		if (IsEmpty()) {
+		if (isEmpty()) {
 			// 先頭と末尾を新しいノードに設定
 			m_pHead = m_pTail = newNode;
 		}
@@ -169,7 +168,7 @@ public:
 		// 新しいノードを作成
 		InteractiveNode<T>* newNode = new InteractiveNode<T>(In_Value);
 		// リストが空の場合
-		if (IsEmpty()) {
+		if (isEmpty()) {
 			// 先頭と末尾を新しいノードに設定
 			m_pHead = m_pTail = newNode;
 		}
@@ -189,7 +188,7 @@ public:
 	// @brief 先頭のデータを削除
 	void popFront() {
 		// リストが空の場合は処理しない
-		if (IsEmpty()) return;
+		if (isEmpty()) return;
 		// 先頭データを一時保存
 		InteractiveNode<T>* tempNode = m_pHead;
 		// データの総数が1つの場合
@@ -213,7 +212,7 @@ public:
 	// @brief 末尾のデータを削除
 	void popBack() {
 		// リストが空の場合は処理しない
-		if (IsEmpty()) return;
+		if (isEmpty()) return;
 		// 末尾データを一時保存
 		InteractiveNode<T>* tempNode = m_pTail;
 		// データの総数が1つの場合
