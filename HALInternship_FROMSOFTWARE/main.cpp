@@ -20,12 +20,14 @@ int main(void)
 	// リストの内容を表示
 	for(auto& data : list)
 	{
+		// スコアと名前を表示
 		std::cout << 
 			"Score: " << data.m_nScore
 			<< ", " << 
 			"Name: " << data.m_Name 
 			<< std::endl;
 	}
+
 
 	// プログラム終了
 	return 0;

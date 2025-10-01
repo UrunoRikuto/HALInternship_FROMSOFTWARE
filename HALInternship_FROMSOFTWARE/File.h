@@ -11,9 +11,7 @@
 #include <sstream>
 #include "InteractiveList.h"
 
-/// <summary>
-/// データ構造体
-/// </summary>
+// @brief データ構造体
 struct DataParam
 {
 	// @brief スコア
@@ -22,12 +20,10 @@ struct DataParam
 	std::string m_Name = "";
 };
 
-/// <summary>
-/// ファイルからデータを読み込み、リストに格納
-/// </summary>
-/// <param name="In_FileName">読み込むファイルパス</param>
-/// <param name="Out_List">格納するリスト</param>
-/// <returns>ファイル操作が成功したらtrue,失敗したらfalse</returns>
+// @brief ファイルからデータを読み込み、リストに格納
+// @param In_FileName 読み込むファイルパス
+// @param Out_List 格納するリスト
+// @return ファイル操作が成功したらtrue,失敗したらfalse
 template<typename T>
 bool LoadFile(const std::string& In_FileName, InteractiveList<T>& Out_List) {
 	// ファイルを開く
