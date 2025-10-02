@@ -8,10 +8,8 @@
 // メイン関数
 int main(void)
 {
-	using DataList = InteractiveList<DataParam>;
-
 	// 双方向リストの作成
-	DataList list;
+	InteractiveList<DataParam> list;
 
 	// ファイル読み込み
 	if (!LoadFile(FILE_PATH, list))
@@ -21,7 +19,7 @@ int main(void)
 
 	// リストの内容を表示
 	//  const版イテレーターを取得
-	const DataList Iterator = list;
+	const InteractiveList<DataParam> Iterator = list;
 	// イテレーターを使ってリストの各要素にアクセス
 	for(auto& data : Iterator)
 	{
@@ -32,7 +30,6 @@ int main(void)
 			"Name: " << data.m_Name 
 			<< std::endl;
 	}
-
 
 	// プログラム終了
 	return 0;
