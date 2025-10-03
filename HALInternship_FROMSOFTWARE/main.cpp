@@ -18,15 +18,6 @@ int main(void)
 	}
 
 	// リストの内容を表示
-	//  const版イテレーターを取得
-	const InteractiveList<DataParam> const_list = list;
-
-	InteractiveList<DataParam>::const_Iterator const_Itr= const_list.begin();
-
-	const DataParam newData{ 200, "New_Player" };
-	const_Itr++;
-	list.insert(const_Itr, newData);
-
 	// イテレーターを使ってリストの各要素にアクセス
 	for (const auto& data : list)
 	{

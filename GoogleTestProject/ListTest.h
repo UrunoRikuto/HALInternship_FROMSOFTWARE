@@ -18,7 +18,7 @@
 * ※コンパイルが通らなければ成功*/
 //#define TT_TEST_ERASE_WHEN_CONST
 
-/* const版リストでconst版イテレーター以外のイテレーターで値の取得ができないか
+/* const版リストでconst版イテレーター以外のイテレーターで値の取得ができないか(先頭イテレーター)
 * ※コンパイルが通らなければ成功*/
 //#define TT_TEST_BEGIN_WHEN_CONST_LIST
 
@@ -26,7 +26,7 @@
 * ※コンパイルが通れば成功*/
 //#define TT_TEST_CONST_BEGIN_WHEN_CONST
 
-/* const版リストでconst版イテレーター以外のイテレーターで値の取得ができないか
+/* const版リストでconst版イテレーター以外のイテレーターで値の取得ができないか(末尾イテレーター)
 * ※コンパイルが通らなければ成功*/
 //#define TT_TEST_END_WHEN_CONST_LIST
 
