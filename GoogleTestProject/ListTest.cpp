@@ -97,7 +97,7 @@ namespace List
 	{
 		InteractiveList<int> list;
 		InteractiveList<int>::Iterator it_begin = list.begin();
-		InteractiveList<int>::Iterator it_end = list.end();
+		InteractiveList<int>::Iterator it_end = list.rbegin();
 		/* 先頭イテレーター */
 		ASSERT_TRUE(list.insert(it_begin, 1));
 		EXPECT_EQ(1, list.getSize());
@@ -134,7 +134,7 @@ namespace List
 
 		list.pushBack(1);
 		list.pushBack(3);
-		InteractiveList<int>::Iterator it_end = list.end();
+		InteractiveList<int>::Iterator it_end = list.rbegin();
 		ASSERT_TRUE(list.insert(it_end, 2));
 
 		InteractiveList<int>::Iterator it = list.begin();
@@ -218,7 +218,7 @@ namespace List
 		list.erase(it);
 		EXPECT_EQ(list.getSize(), 0);
 		// 末尾イテレーター
-		it = list.end();
+		it = list.rbegin();
 		list.erase(it);
 		EXPECT_EQ(list.getSize(), 0);
 	}
@@ -446,7 +446,7 @@ namespace List
 	TEST(ListEnd, TestEndWhenEmpty)
 	{
 		InteractiveList<int> list;
-		InteractiveList<int>::Iterator it = list.end();
+		InteractiveList<int>::Iterator it = list.rbegin();
 		EXPECT_EQ(it, nullptr);
 	}
 	// 項　目：リストに要素が一つある場合に、末尾イテレーターを取得した際の挙動
@@ -466,7 +466,7 @@ namespace List
 		list.pushBack(1);
 		list.pushBack(2);
 		list.pushBack(3);
-		InteractiveList<int>::Iterator it = list.end();
+		InteractiveList<int>::Iterator it = list.rbegin();
 		EXPECT_EQ((*it)->m_Data, 3);
 	}
 	// 項　目：データの挿入を行った後に、末尾イテレーターを取得した際の挙動
@@ -476,9 +476,9 @@ namespace List
 		InteractiveList<int> list;
 		list.pushBack(1);
 		list.pushBack(3);
-		InteractiveList<int>::Iterator it = list.end();
+		InteractiveList<int>::Iterator it = list.rbegin();
 		list.insert(it, 2);
-		it = list.end();
+		it = list.rbegin();
 		EXPECT_EQ((*it)->m_Data, 3);
 		it--;
 		EXPECT_EQ((*it)->m_Data, 2);
@@ -493,9 +493,9 @@ namespace List
 		list.pushBack(1);
 		list.pushBack(2);
 		list.pushBack(3);
-		InteractiveList<int>::Iterator it = list.end();
+		InteractiveList<int>::Iterator it = list.rbegin();
 		list.erase(it);
-		it = list.end();
+		it = list.rbegin();
 		EXPECT_EQ((*it)->m_Data, 2);
 		it--;
 		EXPECT_EQ((*it)->m_Data, 1);
@@ -506,7 +506,7 @@ namespace List
 	{
 #if defined TT_TEST_END_WHEN_CONST_LIST
 		const InteractiveList<int> list;
-		InteractiveList<int>::Iterator it = list.end();//ここでエラー
+		InteractiveList<int>::Iterator it = list.rbegin();//ここでエラー
 #endif //TT_TEST_END_WHEN_CONST_LIST
 		SUCCEED();
 	}
