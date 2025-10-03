@@ -73,9 +73,9 @@ public:
 		return temp;
 	}
 
-	// @brief データへの参照(const版)
-	const T& operator*() {
-		return m_pCurrent->m_Data;
+	// @brief ノード本体へのアクセス(const版)
+	Node* operator*() const {
+		return m_pCurrent;
 	}
 
 	// @brief 代入演算子
@@ -87,7 +87,7 @@ public:
 	}
 
 	// @brief ポインタアクセス
-	const T* operator->() {
+	T* operator->() const {
 		return &(m_pCurrent->m_Data);
 	}
 
@@ -95,10 +95,16 @@ public:
 	const bool operator==(const Self& other) {
 		return m_pCurrent == other.m_pCurrent;
 	}
+	const bool operator==(const Node& other) const {
+		return m_pCurrent == other;
+	}
 
 	// @brief 不等比較演算子
 	const bool operator!=(const Self& other) {
 		return !(*this == other);
+	}
+	const bool operator!=(const Node& other) const {
+		return m_pCurrent != other;
 	}
 
 private:
@@ -160,6 +166,16 @@ public:
 		return m_pCurrent;
 	}
 
+	// @brief 比較演算子
+	bool operator==(const Self& other) {
+		return m_pCurrent == other.m_pCurrent;
+	}
+
+	// @brief 不等比較演算子
+	bool operator!=(const Self& other) {
+		return !(*this == other);
+	}
+
 private:
 	// @brief コンストラクタ
 	Node* m_pCurrent;
@@ -188,7 +204,7 @@ public:
 	{
 		// 他のリストのデータをすべてコピー
 		for (const auto& value : other) {
-			pushBack(value);
+			pushBack(value->m_Data);
 		}
 	}
 
@@ -203,7 +219,7 @@ public:
 		return m_Size; }
 
 	// @brief リストが空かどうかを取得
-	const bool isEmpty() const {
+	bool isEmpty() const {
 		return m_Size == 0; 
 	}
 
@@ -386,9 +402,43 @@ public:
 		// 次のノードへのイテレーターを返す
 		return Iterator(nextNode);
 	}
+	const_Iterator erase(const_Iterator pos) {
+		// リストが空の場合は処理しない
+		if (isEmpty()) return pos;
+		InteractiveList<T>* nonConstList = const_cast<InteractiveList<T>*>(this);
+		// 削除するノードを取得
+		InteractiveNode<T>* nodeToDelete = (*pos);
+		if (!nodeToDelete) return pos;
+		// ノードの前後のノードを取得
+		InteractiveNode<T>* prevNode = nodeToDelete->m_pPrevData;
+		InteractiveNode<T>* nextNode = nodeToDelete->m_pNextData;
+		// 前のノードが存在する場合、その次のノードを更新
+		if (prevNode) {
+			prevNode->m_pNextData = nextNode;
+		}
+		else {
+			// 削除するノードが先頭の場合、先頭を更新
+			nonConstList->m_pHead = nextNode;
+		}
+		// 次のノードが存在する場合、その前のノードを更新
+		if (nextNode) {
+			nextNode->m_pPrevData = prevNode;
+		}
+		else {
+			// 削除するノードが末尾の場合、末尾を更新
+			nonConstList->m_pTail = prevNode;
+		}
+		// ノードを削除
+		delete nodeToDelete;
+		nonConstList->m_Size--;
+		// 次のノードへのイテレーターを返す
+		return const_Iterator(nextNode);
+	}
 
 	// @brief 要素の挿入
 	Iterator insert(Iterator pos, const T& value) {
+		// 無効なイテレーターの場合は処理しない
+		if (pos == end() && pos != begin() || pos == rend() && pos != rbegin()) return pos;
 		// 新しいノードを作成
 		InteractiveNode<T>* newNode = new(std::nothrow) InteractiveNode<T>(value);
 		// メモリ確保に失敗した場合は処理しない
@@ -421,11 +471,45 @@ public:
 		// 新しいノードへのイテレーターを返す
 		return Iterator(newNode);
 	}
-	bool insert(const_Iterator pos, const T& value) {
-		return false;
+	const_Iterator insert(const_Iterator pos, const T& value) {
+
+		const InteractiveList<T>& const_List = *this;
+
+		// 無効なイテレーターの場合は処理しない
+		if (pos == const_List.end() && pos != const_List.begin()
+			|| pos == const_List.rend() && pos != const_List.rbegin()) return pos;
+		// 新しいノードを作成
+		InteractiveNode<T>* newNode = new(std::nothrow) InteractiveNode<T>(value);
+		// メモリ確保に失敗した場合は処理しない
+		if (!newNode) return pos;
+		// 挿入位置がnullptrの場合、リストの末尾に挿入
+		if (!(*pos)) {
+			pushBack(value);
+			m_Size--; // pushBackで増えた分を戻す
+		}
+		else {
+			// 挿入位置のノードを取得
+			InteractiveNode<T>* currentNode = (*pos);
+			// 挿入位置の前に新しいノードを挿入
+			newNode->m_pNextData = currentNode;
+			newNode->m_pPrevData = currentNode->m_pPrevData;
+			// 前のノードが存在する場合、その次のノードを新しいノードに更新
+			if (currentNode->m_pPrevData) {
+				currentNode->m_pPrevData->m_pNextData = newNode;
+			}
+			else {
+				// 挿入位置が先頭の場合、先頭を更新
+				m_pHead = newNode;
+			}
+			// 挿入位置の前のノードを新しいノードに更新
+			currentNode->m_pPrevData = newNode;
+		}
+		// データ数を増やす
+		m_Size++;
+		// 新しいノードへのイテレーターを返す
+		return const_Iterator(newNode);
 	}
 	
-
 private:
 	// @brief 先頭のデータ
 	InteractiveNode<T>* m_pHead;

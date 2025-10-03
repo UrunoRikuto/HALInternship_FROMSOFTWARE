@@ -19,17 +19,26 @@ int main(void)
 
 	// リストの内容を表示
 	//  const版イテレーターを取得
-	const InteractiveList<DataParam> Iterator = list;
+	const InteractiveList<DataParam> const_list = list;
+
+	InteractiveList<DataParam>::const_Iterator const_Itr= const_list.begin();
+
+	const DataParam newData{ 200, "New_Player" };
+	const_Itr++;
+	list.insert(const_Itr, newData);
+
 	// イテレーターを使ってリストの各要素にアクセス
-	for(auto& data : Iterator)
+	for (const auto& data : list)
 	{
 		// スコアと名前を表示
 		std::cout << 
-			"Score: " << data.m_nScore
+			"Score: " << data->m_Data.m_nScore
 			<< ", " << 
-			"Name: " << data.m_Name 
+			"Name: " << data->m_Data.m_Name 
 			<< std::endl;
 	}
+
+	list.clear();
 
 	// プログラム終了
 	return 0;
