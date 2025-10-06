@@ -60,7 +60,6 @@ public:
 	InteractiveConstIterator(const Self& other) : m_pCurrent(other.m_pCurrent), m_pOwner(other.m_pOwner) {
 	}
 
-	// InteractiveIterator からの変換コンストラクタ
 
 	// @brief 前置インクリメント
 	Self& operator++() {
@@ -109,9 +108,6 @@ public:
 	// @brief 比較演算子
 	bool operator==(Self& other) {
 		return m_pCurrent == other.m_pCurrent;
-	}
-	bool operator==(std::nullptr_t) {
-		return m_pCurrent == nullptr;
 	}
 
 	// @brief 不等比較演算子
@@ -194,9 +190,6 @@ public:
 	// @brief 比較演算子
 	bool operator==(Self& other) {
 		return m_pCurrent == other.m_pCurrent;
-	}
-	bool operator==(std::nullptr_t) {
-		return m_pCurrent == nullptr;
 	}
 
 	// @brief 不等比較演算子
@@ -409,6 +402,9 @@ public:
 		// 所属するリストが異なる場合は処理しない
 		if (pos.owner() != this) return false;
 
+		//　イテレーターがnullptrだった場合は処理しない
+		if (pos == nullptr)return false;
+
 		// 削除するノードを取得
 		Node* nodeToDelete = new(std::nothrow) Node(*pos);
 		if (!nodeToDelete) return false;
@@ -444,6 +440,9 @@ public:
 		// 所属するリストが異なる場合は処理しない
 		if (pos.owner() != this) return false;
 
+		// イテレーターがnullptrだった場合は処理しない
+		if (pos == nullptr)return false;
+
 		// 削除するノードを取得
 		Node* nodeToDelete = new(std::nothrow) Node((*pos));
 		if (!nodeToDelete) return false;
@@ -478,19 +477,24 @@ public:
 		// 所属するリストが異なる場合は処理しない
 		if (pos.owner() != this) return false;
 
-		// 無効なイテレーターの場合は処理しない
-		if (pos != end() && pos != rend() && pos != begin() && pos != rbegin() && pos == nullptr) return false;
+		// イテレーターがnullptrの場合はbegin or endとみる
+		if (pos == begin())
+		{
+			pushFront(value);
+			return true;
+		}
+		else if (pos == end())
+		{
+			return false;
+		}
 
 		// 挿入するノードを作成
 		Node* newNode = new(std::nothrow) Node(value);
 		if (!newNode) return false;
 		// 挿入位置のノードを取得
-		Node* currentNode = new(std::nothrow) Node(*pos);
-		if (!currentNode) {
-			// 挿入位置が末尾の場合、pushBackを使用
-			pushBack(value);
-			return true;
-		}
+		Node* currentNode = Node(*pos);
+		if (!currentNode)return false;
+		
 		// 挿入位置の前のノードを取得
 		Node* prevNode = currentNode->m_pPrevData;
 		// 新しいノードの前後のノードを設定
@@ -514,20 +518,25 @@ public:
 		// 所属するリストが異なる場合は処理しない
 		if (pos.owner() != this) return false;
 
-		// 無効なイテレーターの場合は処理しない
-		if (pos != cend() && pos != crend() && pos != cbegin() && pos != crbegin() && pos == nullptr) return false;
+		// イテレーターがnullptrの場合はbegin or endとみる
+		if (pos == cbegin())
+		{
+			pushFront(value);
+			return true;
+		}
+		else if (pos == cend())
+		{
+			return false;
+		}
 
 		
 		// 挿入するノードを作成
 		Node* newNode = new(std::nothrow) Node(value);
 		if (!newNode) return false;
 		// 挿入位置のノードを取得
-		Node* currentNode = new(std::nothrow) Node((*pos));
-		if (!currentNode) {
-			// 挿入位置が末尾の場合、pushBackを使用
-			pushBack(value);
-			return true;
-		}
+		Node* currentNode = Node(*pos);
+		if (!currentNode)return false;
+		
 		// 挿入位置の前のノードを取得
 		Node* prevNode = currentNode->m_pPrevData;
 		// 新しいノードの前後のノードを設定
