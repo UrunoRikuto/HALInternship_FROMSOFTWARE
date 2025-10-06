@@ -53,7 +53,7 @@ public:
 	}
 
 	// @brief コンストラクタ
-	InteractiveConstIterator(Node* node, List* owner) : m_pCurrent(node), m_pOwner(owner) {
+	InteractiveConstIterator(const Node* node,const List* owner) : m_pCurrent(node), m_pOwner(owner) {
 	}
 
 	// @brief コピーコンストラクタ
@@ -61,9 +61,6 @@ public:
 	}
 
 	// InteractiveIterator からの変換コンストラクタ
-	InteractiveConstIterator(const InteractiveIterator<T>& other) : m_pCurrent(other.m_pCurrent), m_pOwner(other.m_pOwner) {
-	}
-
 
 	// @brief 前置インクリメント
 	Self& operator++() {
@@ -91,44 +88,47 @@ public:
 		return temp;
 	}
 
-	// @brief ノード本体へのアクセス(const版)
-	Node* operator*() const {
-		return m_pCurrent;
+	// @brief データへの参照(const版)
+	const T& operator*() const {
+		return m_pCurrent->m_Data;
+	}
+
+	// @brief ポインタアクセス
+	const T* operator->() const {
+		return &(m_pCurrent->m_Data);
 	}
 
 	// @brief 代入演算子
-	Self& operator=(const Self& other) {
+	const Self& operator=(const Self& other) {
 		if (this != &other) {
 			m_pCurrent = other.m_pCurrent;
 		}
 		return *this;
 	}
 
-	// @brief ポインタアクセス
-	T* operator->() const {
-		return &(m_pCurrent->m_Data);
-	}
-
 	// @brief 比較演算子
-	const bool operator==(const Self& other) const {
+	bool operator==(Self& other) {
 		return m_pCurrent == other.m_pCurrent;
+	}
+	bool operator==(std::nullptr_t) {
+		return m_pCurrent == nullptr;
 	}
 
 	// @brief 不等比較演算子
-	const bool operator!=(const Self& other) const {
+	bool operator!=(Self& other) {
 		return !(*this == other);
 	}
 
 	// @brief 所属するリストを取得
-	List* owner()const{
+	const List* owner()const{
 		return m_pOwner;
 	}
 
 private:
 	// @brief 現在のノード
-	Node* m_pCurrent;
+	const Node* m_pCurrent;
 	// @brief 所属するリスト
-	List* m_pOwner;
+	const List* m_pOwner;
 
 };
 
@@ -182,27 +182,30 @@ public:
 	}
 
 	// @brief データへの参照(非const版)
-	T& operator->() {
+	T& operator* () {
 		return m_pCurrent->m_Data;
 	}
 
-	// @brief ノード本体へのアクセス(非const版)
-	Node* operator* () {
-		return m_pCurrent;
+	// @brief データへの参照(非const版)
+	T* operator->() {
+		return &(m_pCurrent->m_Data);
 	}
 
 	// @brief 比較演算子
-	bool operator==(const Self& other) const {
+	bool operator==(Self& other) {
 		return m_pCurrent == other.m_pCurrent;
+	}
+	bool operator==(std::nullptr_t) {
+		return m_pCurrent == nullptr;
 	}
 
 	// @brief 不等比較演算子
-	bool operator!=(const Self& other) const {
+	bool operator!=(Self& other) {
 		return !(*this == other);
 	}
 
 	// @brief 所属するリストを取得
-	List* owner()const {
+	List* owner(){
 		return m_pOwner;
 	}
 
@@ -407,7 +410,7 @@ public:
 		if (pos.owner() != this) return false;
 
 		// 削除するノードを取得
-		Node* nodeToDelete = (*pos);
+		Node* nodeToDelete = new(std::nothrow) Node(*pos);
 		if (!nodeToDelete) return false;
 		// ノードの前後のノードを取得
 		Node* prevNode = nodeToDelete->m_pPrevData;
@@ -442,7 +445,7 @@ public:
 		if (pos.owner() != this) return false;
 
 		// 削除するノードを取得
-		Node* nodeToDelete = (*pos);
+		Node* nodeToDelete = new(std::nothrow) Node((*pos));
 		if (!nodeToDelete) return false;
 		// ノードの前後のノードを取得
 		Node* prevNode = nodeToDelete->m_pPrevData;
@@ -472,85 +475,76 @@ public:
 
 	// @brief 要素の挿入
 	bool insert(Iterator pos, const T& value) {
-
 		// 所属するリストが異なる場合は処理しない
 		if (pos.owner() != this) return false;
 
 		// 無効なイテレーターの場合は処理しない
-		if ((*pos) == nullptr &&
-			!(pos == begin() || pos == end() || pos == rbegin() || pos == rend())) {
-			return false;
-		}
-		// 新しいノードを作成
+		if (pos != end() && pos != rend() && pos != begin() && pos != rbegin() && pos == nullptr) return false;
+
+		// 挿入するノードを作成
 		Node* newNode = new(std::nothrow) Node(value);
-		// メモリ確保に失敗した場合は処理しない
 		if (!newNode) return false;
-		// 挿入位置がnullptrの場合、リストの末尾に挿入
-		if (!(*pos)) {
+		// 挿入位置のノードを取得
+		Node* currentNode = new(std::nothrow) Node(*pos);
+		if (!currentNode) {
+			// 挿入位置が末尾の場合、pushBackを使用
 			pushBack(value);
+			return true;
+		}
+		// 挿入位置の前のノードを取得
+		Node* prevNode = currentNode->m_pPrevData;
+		// 新しいノードの前後のノードを設定
+		newNode->m_pPrevData = prevNode;
+		newNode->m_pNextData = currentNode;
+		// 前のノードが存在する場合、その次のノードを新しいノードに設定
+		if (prevNode) {
+			prevNode->m_pNextData = newNode;
 		}
 		else {
-			// 挿入位置のノードを取得
-			Node* currentNode = (*pos);
-
-			// 挿入位置の前に新しいノードを挿入
-			newNode->m_pNextData = currentNode;
-			newNode->m_pPrevData = currentNode->m_pPrevData;
-			// 前のノードが存在する場合、その次のノードを新しいノードに更新
-			if (currentNode->m_pPrevData) {
-				currentNode->m_pPrevData->m_pNextData = newNode;
-			}
-			else {
-				// 挿入位置が先頭の場合、先頭を更新
-				m_pHead = newNode;
-			}
-			// 挿入位置の前のノードを新しいノードに更新
-			currentNode->m_pPrevData = newNode;
-			// データ数を増やす
-			m_Size++;
+			// 挿入位置が先頭の場合、先頭を新しいノードに更新
+			m_pHead = newNode;
 		}
-		// 成功
+		// 挿入位置のノードの前のノードを新しいノードに設定
+		currentNode->m_pPrevData = newNode;
+		// データ数を増やす
+		m_Size++;
 		return true;
 	}
 	bool insert(const_Iterator pos, const T& value) {
-		
 		// 所属するリストが異なる場合は処理しない
 		if (pos.owner() != this) return false;
 
 		// 無効なイテレーターの場合は処理しない
-		if ((*pos) == nullptr &&
-			!(pos == cbegin() || pos == cend() || pos == crbegin() || pos == crend())) {
-			return false;
-		}
+		if (pos != cend() && pos != crend() && pos != cbegin() && pos != crbegin() && pos == nullptr) return false;
 
-		// 新しいノードを作成
+		
+		// 挿入するノードを作成
 		Node* newNode = new(std::nothrow) Node(value);
-		// メモリ確保に失敗した場合は処理しない
 		if (!newNode) return false;
-		// 挿入位置がnullptrの場合、リストの末尾に挿入
-		if (!(*pos)) {
+		// 挿入位置のノードを取得
+		Node* currentNode = new(std::nothrow) Node((*pos));
+		if (!currentNode) {
+			// 挿入位置が末尾の場合、pushBackを使用
 			pushBack(value);
+			return true;
+		}
+		// 挿入位置の前のノードを取得
+		Node* prevNode = currentNode->m_pPrevData;
+		// 新しいノードの前後のノードを設定
+		newNode->m_pPrevData = prevNode;
+		newNode->m_pNextData = currentNode;
+		// 前のノードが存在する場合、その次のノードを新しいノードに設定
+		if (prevNode) {
+			prevNode->m_pNextData = newNode;
 		}
 		else {
-			// 挿入位置のノードを取得
-			Node* currentNode = (*pos);
-			// 挿入位置の前に新しいノードを挿入
-			newNode->m_pNextData = currentNode;
-			newNode->m_pPrevData = currentNode->m_pPrevData;
-			// 前のノードが存在する場合、その次のノードを新しいノードに更新
-			if (currentNode->m_pPrevData) {
-				currentNode->m_pPrevData->m_pNextData = newNode;
-			}
-			else {
-				// 挿入位置が先頭の場合、先頭を更新
-				m_pHead = newNode;
-			}
-			// 挿入位置の前のノードを新しいノードに更新
-			currentNode->m_pPrevData = newNode;
-			// データ数を増やす
-			m_Size++;
+			// 挿入位置が先頭の場合、先頭を新しいノードに更新
+			m_pHead = newNode;
 		}
-		// 新しいノードへのイテレーターを返す
+		// 挿入位置のノードの前のノードを新しいノードに設定
+		currentNode->m_pPrevData = newNode;
+		// データ数を増やす
+		m_Size++;
 		return true;
 	}
 	

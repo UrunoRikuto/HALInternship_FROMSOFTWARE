@@ -23,9 +23,9 @@ int main(void)
 	{
 		// スコアと名前を表示
 		std::cout << 
-			"Score: " << data->m_Data.m_nScore
+			"Score: " << data.m_nScore
 			<< ", " << 
-			"Name: " << data->m_Data.m_Name 
+			"Name: " << data.m_Name 
 			<< std::endl;
 	}
 
