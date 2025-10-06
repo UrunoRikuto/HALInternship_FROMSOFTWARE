@@ -109,6 +109,9 @@ public:
 	bool operator==(Self& other) {
 		return m_pCurrent == other.m_pCurrent;
 	}
+	bool operator==(std::nullptr_t) {
+		return m_pCurrent == nullptr;
+	}
 
 	// @brief •s“™”äŠr‰‰Zq
 	bool operator!=(Self& other) {
@@ -190,6 +193,9 @@ public:
 	// @brief ”äŠr‰‰Zq
 	bool operator==(Self& other) {
 		return m_pCurrent == other.m_pCurrent;
+	}
+	bool operator==(std::nullptr_t) {
+		return m_pCurrent == nullptr;
 	}
 
 	// @brief •s“™”äŠr‰‰Zq
@@ -492,7 +498,7 @@ public:
 		Node* newNode = new(std::nothrow) Node(value);
 		if (!newNode) return false;
 		// ‘}“üˆÊ’u‚Ìƒm[ƒh‚ğæ“¾
-		Node* currentNode = Node(*pos);
+		Node* currentNode = new(std::nothrow) Node(*pos);
 		if (!currentNode)return false;
 		
 		// ‘}“üˆÊ’u‚Ì‘O‚Ìƒm[ƒh‚ğæ“¾
@@ -534,7 +540,7 @@ public:
 		Node* newNode = new(std::nothrow) Node(value);
 		if (!newNode) return false;
 		// ‘}“üˆÊ’u‚Ìƒm[ƒh‚ğæ“¾
-		Node* currentNode = Node(*pos);
+		Node* currentNode = new(std::nothrow) Node(*pos);
 		if (!currentNode)return false;
 		
 		// ‘}“üˆÊ’u‚Ì‘O‚Ìƒm[ƒh‚ğæ“¾
