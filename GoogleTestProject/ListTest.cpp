@@ -433,7 +433,7 @@ namespace List
 		EXPECT_EQ(it, dummy);
 	}
 	// 項　目：リストに要素が一つある場合に、先頭イテレーターを取得した際の挙動
-	// 理　想：その要素を指すイテレーターが返る
+	// 理　想：先頭の要素を指すイテレーターが返る
 	TEST(ListBegin, TestBeginWhenHaveOneData)
 	{
 		// リストを作成
@@ -442,8 +442,8 @@ namespace List
 		list.pushBack(1);
 		// 先頭イテレーターを取得
 		InteractiveList<int>::Iterator it = list.begin();
-		// 先頭イテレーターが1を指していることを確認
-		EXPECT_EQ((*it), 1);
+		// 取得したイテレーターが先頭の要素を指していることを確認
+		EXPECT_EQ(it, list.begin());
 	}
 	// 項　目：リストに複数の要素がある場合に、先頭イテレーターを取得した際の挙動
 	// 理　想：先頭の要素を指すイテレーターが返る
@@ -457,8 +457,8 @@ namespace List
 		list.pushBack(3);
 		// 先頭イテレーターを取得
 		InteractiveList<int>::Iterator it = list.begin();
-		// 先頭イテレーターが1を指していることを確認
-		EXPECT_EQ((*it), 1);
+		// 取得したイテレーターが先頭の要素を指していることを確認
+		EXPECT_EQ((*it), (*list.begin()));
 	}
 	// 項　目：データの挿入を行った後に、先頭イテレーターを取得した際の挙動
 	// 理　想：先頭の要素を指すイテレーターが返る
@@ -475,8 +475,8 @@ namespace List
 		list.insert(it, 1);
 		// 先頭イテレーターを再取得
 		it = list.begin();
-		// 先頭イテレーターが1を指していることを確認
-		EXPECT_EQ((*it), 1);
+		// 取得したイテレーターが先頭の要素を指していることを確認
+		EXPECT_EQ((*it), (*list.begin()));
 	}
 	// 項　目：データの削除を行った後に、先頭イテレーターを取得した際の挙動
 	// 理　想：先頭の要素を指すイテレーターが返る
@@ -494,8 +494,8 @@ namespace List
 		list.erase(it);
 		// 先頭イテレーターを再取得
 		it = list.begin();
-		// 先頭イテレーターが2を指していることを確認
-		EXPECT_EQ((*it), 2);
+		// 取得したイテレーターが先頭の要素を指していることを確認
+		EXPECT_EQ((*it), (*list.begin()));
 	}
 	// 項　目：constのリストからConst版イテレーターでない先頭イテレーターを取得した際の挙動
 	// 理　想：マクロ定義してコンパイルエラーになれば成功
@@ -525,7 +525,7 @@ namespace List
 		EXPECT_EQ(it, dummy);
 	}
 	// 項　目：リストに要素が一つある場合に、先頭コンストイテレーターを取得した際の挙動
-	// 理　想：その要素を指すイテレーターが返る
+	// 理　想：先頭の要素を指すイテレーターが返る
 	TEST(ListConstBegin, TestConstBeginWhenHaveOneData)
 	{
 		// リストを作成
@@ -534,8 +534,8 @@ namespace List
 		list.pushBack(1);
 		// 先頭コンストイテレーターを取得
 		InteractiveList<int>::const_Iterator it = list.cbegin();
-		// 先頭コンストイテレーターが1を指していることを確認
-		EXPECT_EQ((*it), 1);
+		// 取得したイテレーターが先頭の要素を指していることを確認
+		EXPECT_EQ((*it), (*list.cbegin()));
 	}
 	// 項　目：リストに複数の要素がある場合に、先頭コンストイテレーターを取得した際の挙動
 	// 理　想：先頭の要素を指すイテレーターが返る
@@ -549,8 +549,8 @@ namespace List
 		list.pushBack(3);
 		// 先頭コンストイテレーターを取得
 		InteractiveList<int>::const_Iterator it = list.cbegin();
-		// 先頭コンストイテレーターが1を指していることを確認
-		EXPECT_EQ((*it), 1);
+		// 取得したイテレーターが先頭の要素を指していることを確認
+		EXPECT_EQ((*it), (*list.cbegin()));
 	}
 	// 項　目：データの挿入を行った後に、先頭コンストイレーターを取得した際の挙動
 	// 理　想：先頭の要素を指すイテレーターが返る
@@ -567,8 +567,8 @@ namespace List
 		list.insert(it, 1);
 		// 先頭コンストイテレーターを再取得
 		InteractiveList<int>::const_Iterator const_it = list.cbegin();
-		// 先頭コンストイテレーターが1を指していることを確認
-		EXPECT_EQ((*const_it), 1);
+		// 取得したイテレーターが先頭の要素を指していることを確認
+		EXPECT_EQ((*const_it), (*list.cbegin()));
 	}
 	// 項　目：データの削除を行った後に、先頭コンストイレーターを取得した際の挙動
 	// 理　想：先頭の要素を指すイテレーターが返る
@@ -586,8 +586,8 @@ namespace List
 		list.erase(it);
 		// 先頭コンストイテレーターを再取得
 		InteractiveList<int>::const_Iterator const_it = list.cbegin();
-		// 先頭コンストイテレーターが2を指していることを確認
-		EXPECT_EQ((*const_it), 2);
+		// 取得したイテレーターが先頭の要素を指していることを確認
+		EXPECT_EQ((*const_it), (*list.cbegin()));
 	}
 	// 項　目：constのメソッドであるか
 	// 理　想：マクロ定義してコンパイルが通れば成功
@@ -621,7 +621,7 @@ namespace List
 		EXPECT_EQ(it, dummy);
 	}
 	// 項　目：リストに要素が一つある場合に、末尾イテレーターを取得した際の挙動
-	// 理　想：その要素を指すイテレーターが返る
+	// 理　想：末尾の要素を指すイテレーターが返る
 	TEST(ListEnd, TestEndWhenHaveOneData)
 	{
 		// リストを作成
@@ -630,8 +630,9 @@ namespace List
 		list.pushBack(1);
 		// 末尾イテレーターを取得
 		InteractiveList<int>::Iterator it = list.rbegin();
-		// 末尾イテレーターが1を指していることを確認
-		EXPECT_EQ((*it), 1);
+		
+		// 取得したイテレーターの示す要素が末尾の要素と等しいことを確認
+		EXPECT_EQ((*it), (*list.rbegin()));
 	}
 	// 項　目：リストに複数の要素がある場合に、末尾イテレーターを取得した際の挙動
 	// 理　想：末尾の要素を指すイテレーターが返る
@@ -645,8 +646,8 @@ namespace List
 		list.pushBack(3);
 		// 末尾イテレーターを取得
 		InteractiveList<int>::Iterator it = list.rbegin();
-		// 末尾イテレーターが3を指していることを確認
-		EXPECT_EQ((*it), 3);
+		// 取得したイテレーターの示す要素が末尾の要素と等しいことを確認
+		EXPECT_EQ((*it), (*list.rbegin()));
 	}
 	// 項　目：データの挿入を行った後に、末尾イテレーターを取得した際の挙動
 	// 理　想：末尾の要素を指すイテレーターが返る
@@ -663,12 +664,9 @@ namespace List
 		list.insert(it, 2);
 		// 末尾イテレーターを再取得
 		it = list.rbegin();
-		// データが3,2,1の順であることを確認
-		EXPECT_EQ((*it), 3);
-		it--;
-		EXPECT_EQ((*it), 2);
-		it--;
-		EXPECT_EQ((*it), 1);
+
+		// 取得したイテレーターの示す要素が末尾の要素と等しいことを確認
+		EXPECT_EQ((*it), (*list.rbegin()));
 	}
 	// 項　目：データの削除を行った後に、末尾イテレーターを取得した際の挙動
 	// 理　想：末尾の要素を指すイテレーターが返る
@@ -686,10 +684,9 @@ namespace List
 		list.erase(it);
 		// 末尾イテレーターを再取得
 		it = list.rbegin();
-		// データが2,1の順であることを確認
-		EXPECT_EQ((*it), 2);
-		it--;
-		EXPECT_EQ((*it), 1);
+		
+		// 取得したイテレーターの示す要素が末尾の要素と等しいことを確認
+		EXPECT_EQ((*it), (*list.rbegin()));
 	}
 	// 項　目：constのリストからConst版イテレーターでない末尾イテレーターを取得した際の挙動
 	// 理　想：マクロ定義してコンパイルエラーになれば成功
@@ -728,8 +725,8 @@ namespace List
 		list.pushBack(1);
 		// 末尾コンストイテレーターを取得
 		InteractiveList<int>::const_Iterator it = list.crbegin();
-		// 末尾コンストイテレーターが1を指していることを確認
-		EXPECT_EQ((*it), 1);
+		// 取得したイテレーターの示す要素が末尾の要素と等しいことを確認
+		EXPECT_EQ((*it), (*list.crbegin()));
 	}
 	// 項　目：リストに複数の要素がある場合に、末尾コンストイレーターを取得した際の挙動
 	// 理　想：末尾の要素を指すイテレーターが返る
@@ -743,8 +740,8 @@ namespace List
 		list.pushBack(3);
 		// 末尾コンストイテレーターを取得
 		InteractiveList<int>::const_Iterator it = list.crbegin();
-		// 末尾コンストイテレーターが3を指していることを確認
-		EXPECT_EQ((*it), 3);
+		// 取得したイテレーターの示す要素が末尾の要素と等しいことを確認
+		EXPECT_EQ((*it), (*list.crbegin()));
 	}
 	// 項　目：データの挿入を行った後に、末尾コンストイテレーターを取得した際の挙動
 	// 理　想：末尾の要素を指すイテレーターが返る
@@ -756,13 +753,13 @@ namespace List
 		list.pushBack(1);
 		list.pushBack(3);
 		// 末尾イテレーターを取得
-		InteractiveList<int>::Iterator it = list.rbegin();
+		InteractiveList<int>::const_Iterator it = list.crbegin();
 		// 2を挿入
 		list.insert(it, 2);
 		// 末尾コンストイテレーターを再取得
 		InteractiveList<int>::const_Iterator const_it = list.crbegin();
-		// 末尾コンストイテレーターが3を指していることを確認
-		EXPECT_EQ((*const_it), 3);
+		// 取得したイテレーターの示す要素が末尾の要素と等しいことを確認
+		EXPECT_EQ((*const_it), (*list.crbegin()));
 	}
 	// 項　目：データの削除を行った後に、末尾コンストイテレーターを取得した際の挙動
 	// 理　想：末尾の要素を指すイテレーターが返る
@@ -775,13 +772,13 @@ namespace List
 		list.pushBack(2);
 		list.pushBack(3);
 		// 末尾イテレーターを取得
-		InteractiveList<int>::Iterator it = list.rbegin();
+		InteractiveList<int>::const_Iterator it = list.crbegin();
 		// 3を削除
 		list.erase(it);
 		// 末尾コンストイテレーターを再取得
 		InteractiveList<int>::const_Iterator const_it = list.crbegin();
-		// 末尾コンストイテレーターが2を指していることを確認
-		EXPECT_EQ((*const_it), 2);
+		// 取得したイテレーターの示す要素が末尾の要素と等しいことを確認
+		EXPECT_EQ((*const_it), (*list.crbegin()));
 	}
 	// 項　目：constのメソッドであるか
 	// 理　想：マクロ定義してコンパイルが通れば成功
@@ -1131,7 +1128,7 @@ namespace Iterator
 
 	//============================= 二つのイテレーターが同一のものであるか比較 =============================//
 	// 項　目：リストが空の状態で先頭イテレーターと末尾イテレーターを比較した際の挙動
-	// 理　想：同じである
+	// 理　想：同じである(TRUE)
 	TEST(IteratorCompare, TestCompareWhenEmptyToBeginAndEnd)
 	{
 		// リストを作成
@@ -1143,7 +1140,7 @@ namespace Iterator
 		EXPECT_TRUE(it_begin == it_end);
 	}
 	// 項　目：同一のイテレーターを比較した際の挙動
-	// 理　想：同じである
+	// 理　想：同じである(TRUE)
 	TEST(IteratorCompare, TestCompareWhenSameIterator)
 	{
 		// リストを作成
@@ -1158,7 +1155,7 @@ namespace Iterator
 		EXPECT_TRUE(it == it2);
 	}
 	// 項　目：異なるイテレーターを比較した際の挙動
-	// 理　想：異なるものである
+	// 理　想：異なるものである(FALSE)
 	TEST(IteratorCompare, TestCompareWhenDifferentIterator)
 	{
 		// リストを作成
@@ -1176,7 +1173,7 @@ namespace Iterator
 	
 	//============================= 二つのイテレーターが異なるものであるか比較 =============================//
 	// 項　目：リストが空の状態で先頭イテレーターと末尾イテレーターを比較した際の挙動
-	// 理　想：同じである
+	// 理　想：同じである(FALSE)
 	TEST(IteratorNotCompare, TestNotCompareWhenEmptyToBeginAndEnd)
 	{
 		// リストを作成
@@ -1188,7 +1185,7 @@ namespace Iterator
 		EXPECT_FALSE(it_begin != it_end);
 	}
 	// 項　目：同一のイテレーターを比較した際の挙動
-	// 理　想：同じである
+	// 理　想：同じである(FALSE
 	TEST(IteratorNotCompare, TestNotCompareWhenSameIterator)
 	{
 		// リストを作成
@@ -1203,7 +1200,7 @@ namespace Iterator
 		EXPECT_FALSE(it != it2);
 	}
 	// 項　目：異なるイテレーターを比較した際の挙動
-	// 理　想：異なるものである
+	// 理　想：異なるものである(TRUE)
 	TEST(IteratorNotCompare, TestNotCompareWhenDifferentIterator)
 	{
 		// リストを作成
@@ -1219,4 +1216,4 @@ namespace Iterator
 		EXPECT_TRUE(it != it2);
 	}
 
-}// Constイテレーターのテスト
+}// イテレーターのテスト

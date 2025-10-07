@@ -21,10 +21,9 @@ int main(void)
 	// イテレーターを使ってリストの各要素にアクセス
 	for (const auto& data : list)
 	{
-		// スコアと名前を表示
-		std::cout << 
+		std::cout <<
 			"Score: " << data.m_nScore
-			<< ", " << 
+			<< ", " <<
 			"Name: " << data.m_Name 
 			<< std::endl;
 	}

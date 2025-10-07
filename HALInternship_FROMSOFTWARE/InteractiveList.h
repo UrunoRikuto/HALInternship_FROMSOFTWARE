@@ -151,6 +151,10 @@ private:
 		bool operator!=(Self& other) {
 			return !(*this == other);
 		}
+		// @brief 不等比較演算子(const版)
+		bool operator!=(const Self& other) const {
+			return !(*this == other);
+		}
 
 		// @brief 所属するリストを取得
 		const List* owner()const {
@@ -217,29 +221,16 @@ public:
 	using const_Iterator = InteractiveConstIterator<T>;
 
 	// @brief コンストラクタ
-	InteractiveList()
-		:m_pHead(nullptr)
-		, m_pTail(nullptr)
-		, m_Size(0)
-	{
+	InteractiveList() :m_Size(0){
 		// ダミーノードを作成
 		m_pDummy = new Node();
-		m_pDummy->m_pNextData = m_pDummy;
-		m_pDummy->m_pPrevData = m_pDummy;
-		m_pHead = m_pTail = m_pDummy;
+		m_pDummy->m_pNextData = m_pDummy->m_pPrevData = m_pDummy;
 	}
 
 	// @brief コンストラクタ(コピーコンストラクタ)
-	InteractiveList(const InteractiveList& other)
-		:m_pHead(nullptr)
-		, m_pTail(nullptr)
-		, m_Size(0)
-	{
+	InteractiveList(const InteractiveList& other) :m_Size(0){
 		// ダミーノードを作成
-		m_pHead = m_pTail = m_pDummy;
-		for (auto it = other.begin(); it != other.end(); ++it) {
-			pushBack((*it)->m_Data);
-		}
+		m_pDummy = other.m_pDummy;
 	}
 
 	// @brief デストラクタ
@@ -267,7 +258,7 @@ public:
 		m_pDummy = new Node();
 		m_pDummy->m_pNextData = m_pDummy;
 		m_pDummy->m_pPrevData = m_pDummy;
-		m_pHead = m_pTail = m_pDummy;
+		m_pDummy->m_pNextData = m_pDummy->m_pPrevData = m_pDummy;
 	}
 
 	// @brief 先頭にデータを追加
@@ -280,16 +271,18 @@ public:
 		// リストが空の場合
 		if (isEmpty()) {
 			// 先頭と末尾を新しいノードに設定
-			m_pHead = m_pTail = newNode;
+			m_pDummy->m_pNextData = m_pDummy->m_pPrevData = newNode;
 		}
 		// リストにデータがある場合
 		else {
 			// 追加前の先頭データを新しいノードの次のデータに設定
-			newNode->m_pNextData = m_pHead;
+			newNode->m_pNextData = m_pDummy->m_pNextData;
+			// 追加前の先頭データを新しいノードの前のデータに設定
+			newNode->m_pPrevData = m_pDummy;
 			// 追加前の先頭データの前のデータを新しいノードに設定
-			m_pHead->m_pPrevData = newNode;
+			m_pDummy->m_pNextData->m_pPrevData = newNode;
 			// 先頭データを新しいノードに設定
-			m_pHead = newNode;
+			m_pDummy->m_pNextData = newNode;
 		}
 		// データ数を増やす
 		m_Size++;
@@ -305,16 +298,18 @@ public:
 		// リストが空の場合
 		if (isEmpty()) {
 			// 先頭と末尾を新しいノードに設定
-			m_pHead = m_pTail = newNode;
+			m_pDummy->m_pNextData = m_pDummy->m_pPrevData = newNode;
 		}
 		// リストにデータがある場合
 		else {
 			// 追加前の末尾データを新しいノードの前のデータに設定
-			newNode->m_pPrevData = m_pTail;
+			newNode->m_pPrevData = m_pDummy->m_pPrevData;
+			// 追加前の末尾データを新しいノードの前のデータに設定
+			newNode->m_pNextData = m_pDummy;
 			// 追加前の末尾データの次のデータを新しいノードに設定
-			m_pTail->m_pNextData = newNode;
+			m_pDummy->m_pPrevData->m_pNextData = newNode;
 			// 末尾データを新しいノードに設定
-			m_pTail = newNode;
+			m_pDummy->m_pPrevData = newNode;
 		}
 		// データ数を増やす
 		m_Size++;
@@ -325,18 +320,18 @@ public:
 		// リストが空の場合は処理しない
 		if (isEmpty()) return;
 		// 先頭データを一時保存
-		Node* tempNode = m_pHead;
+		Node* tempNode = m_pDummy->m_pNextData;
 		// データの総数が1つの場合
 		if (m_Size == 1) {
 			//先頭と末尾をnullptrに設定
-			m_pHead = m_pTail = m_pDummy;
+			m_pDummy->m_pNextData = m_pDummy->m_pPrevData = m_pDummy;
 		}
 		// データの総数が複数の場合
 		else {
 			// 先頭データを次のデータに設定
-			m_pHead = m_pHead->m_pNextData;
+			m_pDummy->m_pNextData = m_pDummy->m_pNextData->m_pNextData;
 			// 新しい先頭データの前のデータをnullptrに設定
-			m_pHead->m_pPrevData = m_pDummy;
+			m_pDummy->m_pNextData->m_pPrevData = m_pDummy;
 		}
 		// 一時保存していた先頭データを削除
 		delete tempNode;
@@ -349,18 +344,18 @@ public:
 		// リストが空の場合は処理しない
 		if (isEmpty()) return;
 		// 末尾データを一時保存
-		Node* tempNode = m_pTail;
+		Node* tempNode = m_pDummy->m_pPrevData;
 		// データの総数が1つの場合
 		if (m_Size == 1) {
 			//先頭と末尾をnullptrに設定
-			m_pHead = m_pTail = m_pDummy;
+			m_pDummy->m_pNextData = m_pDummy->m_pPrevData = m_pDummy;
 		}
 		// データの総数が複数の場合
 		else {
 			// 末尾データを前のデータに設定
-			m_pTail = m_pTail->m_pPrevData;
+			m_pDummy->m_pPrevData = m_pDummy->m_pPrevData->m_pPrevData;
 			// 新しい末尾データの次のデータをnullptrに設定
-			m_pTail->m_pNextData = m_pDummy;
+			m_pDummy->m_pPrevData->m_pNextData = m_pDummy;
 		}
 		// 一時保存していた末尾データを削除
 		delete tempNode;
@@ -370,11 +365,11 @@ public:
 
 	// @brief 先頭のconst版イテレーターの取得
 	const const_Iterator cbegin() const {
-		return const_Iterator(m_pHead, this);
+		return const_Iterator(m_pDummy->m_pNextData, this);
 	}
 	// @brief 先頭の非const版イテレーターの取得
 	Iterator begin() {
-		return Iterator(m_pHead, this); 
+		return Iterator(m_pDummy->m_pNextData, this); 
 	}
 
 	// @brief 末尾のconst版イテレーターの取得
@@ -388,11 +383,11 @@ public:
 
 	// @brief 逆方向の先頭のconst版イテレーターの取得
 	const const_Iterator crbegin() const {
-		return const_Iterator(m_pTail, this);
+		return const_Iterator(m_pDummy->m_pPrevData, this);
 	}
 	// @brief 逆方向の先頭の非const版イテレーターの取得
 	Iterator rbegin() {
-		return Iterator(m_pTail, this); 
+		return Iterator(m_pDummy->m_pPrevData, this); 
 	}
 
 	// @brief 逆方向の末尾のconst版イテレーターの取得
@@ -426,7 +421,7 @@ public:
 		}
 		else {
 			// 削除するノードが先頭の場合、先頭を更新
-			m_pHead = nextNode;
+			m_pDummy->m_pNextData = nextNode;
 		}
 		// 次のノードが存在する場合、その前のノードを更新
 		if (nextNode) {
@@ -434,7 +429,7 @@ public:
 		}
 		else {
 			// 削除するノードが末尾の場合、末尾を更新
-			m_pTail = prevNode;
+			m_pDummy->m_pPrevData = prevNode;
 		}
 		// ノードを削除
 		delete pos.m_pCurrent;
@@ -481,7 +476,7 @@ public:
 		}
 		else {
 			// 挿入位置が先頭の場合、先頭を新しいノードに更新
-			m_pHead = newNode;
+			m_pDummy->m_pNextData = newNode;
 		}
 		// 挿入位置のノードの前のノードを新しいノードに設定
 		pos.m_pCurrent->m_pPrevData = newNode;
@@ -493,10 +488,6 @@ public:
 private:
 	// @brief ダミーノード
 	Node* m_pDummy;
-	// @brief 先頭のデータ
-	Node* m_pHead;
-	// @brief 末尾のデータ
-	Node* m_pTail;
 	// @brief データ総数
 	size_t m_Size;
 };
