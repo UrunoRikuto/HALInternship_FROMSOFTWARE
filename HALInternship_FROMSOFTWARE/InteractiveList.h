@@ -34,6 +34,7 @@ private:
 			, m_pNextData(nullptr)
 		{
 		}
+		
 		// @brief デストラクタ
 		~InteractiveNode() = default;
 
@@ -49,9 +50,11 @@ private:
 	template<typename T>
 	class InteractiveConstIterator
 	{
+		// リストクラスをフレンドに設定
 		friend class InteractiveList<T>;
 
 	private:
+		// 型エイリアス
 		using Node = InteractiveNode<T>;
 		using List = InteractiveList<T>;
 		using Self = InteractiveConstIterator<T>;
@@ -76,8 +79,10 @@ private:
 
 		// @brief 前置インクリメント
 		Self& operator++() {
+			// アサートチェック
 			assert(m_pCurrent != nullptr);
 			assert(m_pCurrent != m_pOwner->m_pDummy);
+			// 次のノードへ移動
 			if (m_pCurrent) m_pCurrent = m_pCurrent->m_pNextData;
 			return *this;
 		}
@@ -91,8 +96,10 @@ private:
 
 		// @brief 前置デクリメント
 		Self& operator--() {
+			// アサートチェック
 			assert(m_pCurrent != nullptr);
 			assert(m_pCurrent != m_pOwner->m_pDummy);
+			// 前のノードへ移動
 			if (m_pCurrent) m_pCurrent = m_pCurrent->m_pPrevData;
 			return *this;
 		}
@@ -106,20 +113,25 @@ private:
 
 		// @brief データへの参照(const版)
 		const T& operator*() const {
+			// アサートチェック
 			assert(m_pCurrent != nullptr);
 			assert(m_pCurrent != m_pOwner->m_pDummy);
+			// データを返す
 			return m_pCurrent->m_Data;
 		}
 
 		// @brief ポインタアクセス
 		const T* operator->() const {
+			// アサートチェック
 			assert(m_pCurrent != nullptr);
 			assert(m_pCurrent != m_pOwner->m_pDummy);
+			// データを返す
 			return &(m_pCurrent->m_Data);
 		}
 
 		// @brief 代入演算子
 		const Self& operator=(const Self& other) {
+			// 自分自身への代入でないことを確認
 			if (this != &other) {
 				m_pCurrent = other.m_pCurrent;
 			}
@@ -155,9 +167,11 @@ private:
 	template<typename T>
 	class InteractiveIterator : public InteractiveConstIterator<T>
 	{
+		// リストクラスをフレンドに設定
 		friend class InteractiveList<T>;
 
 	private:
+		// 型エイリアス
 		using Node = InteractiveNode<T>;
 		using List = InteractiveList<T>;
 		using Self = InteractiveIterator<T>;
@@ -179,20 +193,25 @@ private:
 
 		// @brief データへの参照(非const版)
 		T& operator* () {
+			// アサートチェック
 			assert(Base::m_pCurrent != nullptr);
 			assert(Base::m_pCurrent != Base::m_pOwner->m_pDummy);
+			// データを返す
 			return Base::m_pCurrent->m_Data;
 		}
 
 		// @brief データへの参照(非const版)
 		T* operator->() {
+			// アサートチェック
 			assert(Base::m_pCurrent != nullptr);
 			assert(Base::m_pCurrent != Base::m_pOwner->m_pDummy);
+			// データを返す
 			return &(Base::m_pCurrent->m_Data);
 		}
 	};
 
 public:
+	// 型エイリアス
 	using Node = InteractiveNode<T>;
 	using Iterator = InteractiveIterator<T>;
 	using const_Iterator = InteractiveConstIterator<T>;
@@ -203,6 +222,7 @@ public:
 		, m_pTail(nullptr)
 		, m_Size(0)
 	{
+		// ダミーノードを作成
 		m_pDummy = new Node();
 		m_pDummy->m_pNextData = m_pDummy;
 		m_pDummy->m_pPrevData = m_pDummy;
@@ -211,9 +231,12 @@ public:
 
 	// @brief コンストラクタ(コピーコンストラクタ)
 	InteractiveList(const InteractiveList& other)
+		:m_pHead(nullptr)
+		, m_pTail(nullptr)
+		, m_Size(0)
 	{
+		// ダミーノードを作成
 		m_pHead = m_pTail = m_pDummy;
-		m_Size = 0;
 		for (auto it = other.begin(); it != other.end(); ++it) {
 			pushBack((*it)->m_Data);
 		}
