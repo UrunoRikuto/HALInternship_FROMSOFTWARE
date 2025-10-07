@@ -6,6 +6,8 @@
 //--------------------------------------------------------------------------------
 // コンパイル関連手動テスト(リスト)
 
+/**＝＝＝＝＝＝＝＝＝＝＝ リストテスト ＝＝＝＝＝＝＝＝＝＝＝**/
+
 /* constのメソッドであるか
 ※コンパイルが通れば成功*/
 //#define TT_TEST_GET_DATA_SIZE_IS_CONST
@@ -33,5 +35,19 @@
 /* constのメソッドであるか(const版末尾イテレーター)
 * ※コンパイルが通れば成功*/
 //#define TT_TEST_CONST_END_WHEN_CONST
+
+/**＝＝＝＝＝＝＝＝＝＝＝ イテレーターテスト ＝＝＝＝＝＝＝＝＝＝＝**/
+
+/* const版イテレーターで値の取得を行った際に、値の代入ができないか
+* ※コンパイルが通らなければ成功*/
+//#define TT_TEST_GET_DATA_WHEN_CONST_ITERATOR
+
+/* const版イテレーターで値の取得を行った際に、値のコピーができないか
+* ※コンパイルが通らなければ成功*/
+//#define TT_TEST_COPY_WHEN_CONST_ITERATOR
+
+/* const版イテレーターで値の取得を行った際に、値の代入ができないか
+* ※コンパイルが通らなければ成功*/
+//#define TT_TEST_ASSIGN_WHEN_CONST_ITERATOR
 
 #endif // ___TECHTRAINING_CHAPTER2_LIST_MANUAL_TEST___

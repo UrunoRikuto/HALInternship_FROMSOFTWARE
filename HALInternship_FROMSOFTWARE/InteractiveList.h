@@ -6,6 +6,7 @@
 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
 
 #pragma once
+#include <cassert>
 
 // @brief 双方向リストクラス
 // @typeparam T 保存するデータの型
@@ -21,6 +22,7 @@ private:
 		InteractiveNode()
 			: m_pPrevData(nullptr)
 			, m_pNextData(nullptr)
+			, m_Data()
 		{
 
 		}
@@ -43,31 +45,39 @@ private:
 		InteractiveNode* m_pNextData;
 	};
 
-	// @brief 双方向リスト用イテレーター
+	// @brief 双方向リスト用コンストイテレーター
 	template<typename T>
-	class InteractiveIterator
+	class InteractiveConstIterator
 	{
 		friend class InteractiveList<T>;
+
 	private:
 		using Node = InteractiveNode<T>;
 		using List = InteractiveList<T>;
-		using Self = InteractiveIterator<T>;
+		using Self = InteractiveConstIterator<T>;
 	public:
 
 		// @brief デフォルトコンストラクタ
-		InteractiveIterator() : m_pCurrent(nullptr), m_pOwner(nullptr) {
+		InteractiveConstIterator() : m_pCurrent(nullptr), m_pOwner(nullptr) {
 		}
 
 		// @brief コンストラクタ
-		InteractiveIterator(Node* node, List* owner) : m_pCurrent(node), m_pOwner(owner) {
+		InteractiveConstIterator(const Node* node, const List* owner){
+			m_pCurrent = const_cast<Node*>(node);
+			m_pOwner = const_cast<List*>(owner);
 		}
 
 		// @brief コピーコンストラクタ
-		InteractiveIterator(const Self& other) : m_pCurrent(other.m_pCurrent), m_pOwner(other.m_pOwner) {
+		InteractiveConstIterator(const Self& other) {
+			m_pCurrent = other.m_pCurrent;
+			m_pOwner = other.m_pOwner;
 		}
+
 
 		// @brief 前置インクリメント
 		Self& operator++() {
+			assert(m_pCurrent != nullptr);
+			assert(m_pCurrent != m_pOwner->m_pDummy);
 			if (m_pCurrent) m_pCurrent = m_pCurrent->m_pNextData;
 			return *this;
 		}
@@ -81,91 +91,9 @@ private:
 
 		// @brief 前置デクリメント
 		Self& operator--() {
+			assert(m_pCurrent != nullptr);
+			assert(m_pCurrent != m_pOwner->m_pDummy);
 			if (m_pCurrent) m_pCurrent = m_pCurrent->m_pPrevData;
-			return *this;
-		}
-
-		// @brief 後置デクリメント
-		Self operator--(int) {
-			Self temp = *this;
-			--(*this);
-			return temp;
-		}
-
-		// @brief 比較演算子
-		bool operator==(Self& other) {
-			return m_pCurrent == other.m_pCurrent;
-		}
-
-		// @brief 不等比較演算子
-		bool operator!=(Self& other) {
-			return !(*this == other);
-		}
-
-		// @brief データへの参照(非const版)
-		T& operator* () {
-			return m_pCurrent->m_Data;
-		}
-
-		// @brief データへの参照(非const版)
-		T* operator->() {
-			return &(m_pCurrent->m_Data);
-		}
-
-		// @brief 所属するリストを取得
-		List* owner() {
-			return m_pOwner;
-		}
-
-	protected:
-		// @brief 現在のノード
-		Node* m_pCurrent;
-		// @brief 所属するリスト
-		List* m_pOwner;
-	};
-
-	// @brief 双方向リスト用コンストイテレーター
-	template<typename T>
-	class InteractiveConstIterator : public InteractiveIterator<T>
-	{
-	private:
-		using Node = InteractiveNode<T>;
-		using List = InteractiveList<T>;
-		using Self = InteractiveConstIterator<T>;
-		using Base = InteractiveIterator<T>;
-	public:
-
-		// @brief デフォルトコンストラクタ
-		InteractiveConstIterator() : Base() {
-		}
-
-		// @brief コンストラクタ
-		InteractiveConstIterator(const Node* node, const List* owner):Base() {
-			Base::m_pCurrent = const_cast<Node*>(node);
-			Base::m_pOwner = const_cast<List*>(owner);
-		}
-
-		// @brief コピーコンストラクタ
-		InteractiveConstIterator(const Self& other) : Base(other) {
-		}
-
-
-		// @brief 前置インクリメント
-		Self& operator++() {
-			if (Base::m_pCurrent) Base::m_pCurrent = Base::m_pCurrent->m_pNextData;
-			return *this;
-		}
-
-		// @brief 後置インクリメント
-		Self operator++(int) {
-			Self temp = *this;
-			++(*this);
-			return temp;
-		}
-
-		// @brief 前置デクリメント
-		Self& operator--() {
-			if (Base::m_pCurrent) Base::m_pCurrent = Base::m_pCurrent->m_pPrevData;
 			return *this;
 		}
 
@@ -178,25 +106,33 @@ private:
 
 		// @brief データへの参照(const版)
 		const T& operator*() const {
-			return Base::m_pCurrent->m_Data;
+			assert(m_pCurrent != nullptr);
+			assert(m_pCurrent != m_pOwner->m_pDummy);
+			return m_pCurrent->m_Data;
 		}
 
 		// @brief ポインタアクセス
 		const T* operator->() const {
-			return &(Base::m_pCurrent->m_Data);
+			assert(m_pCurrent != nullptr);
+			assert(m_pCurrent != m_pOwner->m_pDummy);
+			return &(m_pCurrent->m_Data);
 		}
 
 		// @brief 代入演算子
 		const Self& operator=(const Self& other) {
 			if (this != &other) {
-				Base::m_pCurrent = other.m_pCurrent;
+				m_pCurrent = other.m_pCurrent;
 			}
 			return *this;
 		}
 
 		// @brief 比較演算子
 		bool operator==(Self& other) {
-			return Base::m_pCurrent == other.m_pCurrent;
+			return m_pCurrent == other.m_pCurrent;
+		}
+		// @brief 比較演算子(const版)
+		bool operator==(const Self& other) const {
+			return m_pCurrent == other.m_pCurrent;
 		}
 
 		// @brief 不等比較演算子
@@ -206,7 +142,53 @@ private:
 
 		// @brief 所属するリストを取得
 		const List* owner()const {
-			return Base::m_pOwner;
+			return m_pOwner;
+		}
+	protected:
+		// @brief 現在のノード
+		Node* m_pCurrent;
+		// @brief 所属するリスト
+		List* m_pOwner;
+	};
+
+	// @brief 双方向リスト用イテレーター
+	template<typename T>
+	class InteractiveIterator : public InteractiveConstIterator<T>
+	{
+		friend class InteractiveList<T>;
+
+	private:
+		using Node = InteractiveNode<T>;
+		using List = InteractiveList<T>;
+		using Self = InteractiveIterator<T>;
+		using Base = InteractiveConstIterator<T>;
+	public:
+
+		// @brief デフォルトコンストラクタ
+		InteractiveIterator() : Base() {
+		}
+
+		// @brief コンストラクタ
+		InteractiveIterator(Node* node, List* owner) : Base(node, owner) {
+		}
+
+		// @brief コピーコンストラクタ
+		InteractiveIterator(const Self& other) : Base(other) {
+		}
+
+
+		// @brief データへの参照(非const版)
+		T& operator* () {
+			assert(Base::m_pCurrent != nullptr);
+			assert(Base::m_pCurrent != Base::m_pOwner->m_pDummy);
+			return Base::m_pCurrent->m_Data;
+		}
+
+		// @brief データへの参照(非const版)
+		T* operator->() {
+			assert(Base::m_pCurrent != nullptr);
+			assert(Base::m_pCurrent != Base::m_pOwner->m_pDummy);
+			return &(Base::m_pCurrent->m_Data);
 		}
 	};
 
@@ -224,6 +206,7 @@ public:
 		m_pDummy = new Node();
 		m_pDummy->m_pNextData = m_pDummy;
 		m_pDummy->m_pPrevData = m_pDummy;
+		m_pHead = m_pTail = m_pDummy;
 	}
 
 	// @brief コンストラクタ(コピーコンストラクタ)
@@ -363,7 +346,7 @@ public:
 	}
 
 	// @brief 先頭のconst版イテレーターの取得
-	const_Iterator cbegin() const {
+	const const_Iterator cbegin() const {
 		return const_Iterator(m_pHead, this);
 	}
 	// @brief 先頭の非const版イテレーターの取得
@@ -372,7 +355,7 @@ public:
 	}
 
 	// @brief 末尾のconst版イテレーターの取得
-	const_Iterator cend() const {
+	const const_Iterator cend() const {
 		return const_Iterator(m_pDummy, this);
 	}
 	// @brief 末尾の非const版イテレーターの取得
@@ -381,7 +364,7 @@ public:
 	}
 
 	// @brief 逆方向の先頭のconst版イテレーターの取得
-	const_Iterator crbegin() const {
+	const const_Iterator crbegin() const {
 		return const_Iterator(m_pTail, this);
 	}
 	// @brief 逆方向の先頭の非const版イテレーターの取得
@@ -390,7 +373,7 @@ public:
 	}
 
 	// @brief 逆方向の末尾のconst版イテレーターの取得
-	const_Iterator crend() const {
+	const const_Iterator crend() const {
 		return const_Iterator(m_pDummy, this);
 	}
 	// @brief 逆方向の末尾の非const版イテレーターの取得
@@ -399,7 +382,7 @@ public:
 	}
 
 	// @brief 要素の削除
-	bool erase(Iterator pos) {
+	bool erase(const_Iterator pos) {
 		// リストが空の場合は処理しない
 		if (isEmpty()) return false;
 
@@ -438,7 +421,7 @@ public:
 	}
 
 	// @brief 要素の挿入
-	bool insert(Iterator pos, const T& value) {
+	bool insert(const_Iterator pos, const T& value) {
 		// 所属するリストが異なる場合は処理しない
 		if (pos.owner() != this) return false;
 
