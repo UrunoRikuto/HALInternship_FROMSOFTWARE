@@ -23,4 +23,9 @@
       <Filter>コードファイル</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="InteractiveList.inl">
+      <Filter>コードファイル</Filter>
+    </None>
+  </ItemGroup>
 </Project>

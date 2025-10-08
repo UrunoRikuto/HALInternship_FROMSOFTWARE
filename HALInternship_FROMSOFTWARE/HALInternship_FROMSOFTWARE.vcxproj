@@ -135,6 +135,9 @@
     <ClInclude Include="File.h" />
     <ClInclude Include="InteractiveList.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="InteractiveList.inl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
