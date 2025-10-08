@@ -18,15 +18,13 @@ private:
 	struct InteractiveNode
 	{
 		// @brief デフォルトコンストラクタ
-		InteractiveNode(): m_pPrevData(nullptr), m_pNextData(nullptr), m_Data(){
-		}
+		InteractiveNode();
 
 		// @brief コンストラクタ
-		InteractiveNode(const T& In_Value):m_Data(In_Value), m_pPrevData(nullptr), m_pNextData(nullptr){
-		}
+		InteractiveNode(const T& In_Value);
 		
 		// @brief デストラクタ
-		~InteractiveNode() = default;
+		~InteractiveNode();
 
 		// @brief データ
 		T m_Data;
@@ -37,7 +35,6 @@ private:
 	};
 
 	// @brief 双方向リスト用コンストイテレーター
-	template<typename T>
 	class InteractiveConstIterator
 	{
 		// リストクラスをフレンドに設定
@@ -47,110 +44,60 @@ private:
 		// 型エイリアス
 		using Node = InteractiveNode;
 		using List = InteractiveList<T>;
-		using Self = InteractiveConstIterator<T>;
+		using Self = InteractiveConstIterator;
 	public:
 
 		// @brief デフォルトコンストラクタ
-		InteractiveConstIterator() : m_pCurrent(nullptr), m_pOwner(nullptr){
-		}	
+		InteractiveConstIterator();
 
 		// @brief コンストラクタ
-		InteractiveConstIterator(const Node* node, const List* owner){
-			m_pCurrent = const_cast<Node*>(node);
-			m_pOwner = const_cast<List*>(owner);
-		}
+		// @param node ノードポインタ
+		// @param owner 所属するリストポインタ
+		InteractiveConstIterator(const Node* node, const List* owner);
 
 		// @brief コピーコンストラクタ
-		InteractiveConstIterator(const Self& other) {
-			m_pCurrent = other.m_pCurrent;
-			m_pOwner = other.m_pOwner;
-		}
+		// @param other コピー元のイテレーター
+		InteractiveConstIterator(const Self& other);
 
 
 		// @brief 前置インクリメント
-		Self& operator++() {
-			// アサートチェック
-			assert(m_pCurrent != nullptr);
-			assert(m_pCurrent != &m_pOwner->m_Dummy);
-			// 次のノードへ移動
-			if (m_pCurrent) m_pCurrent = m_pCurrent->m_pNextData;
-			return *this;
-		}
+		Self& operator++();
 
 		// @brief 後置インクリメント
-		Self operator++(int) {
-			Self temp = *this;
-			++(*this);
-			return temp;
-		}
+		Self operator++(int);
 
 		// @brief 前置デクリメント
-		Self& operator--() {
-			// アサートチェック
-			assert(m_pCurrent != nullptr);
-			assert(m_pCurrent != &m_pOwner->m_Dummy);
-			// 前のノードへ移動
-			if (m_pCurrent) m_pCurrent = m_pCurrent->m_pPrevData;
-			return *this;
-		}
+		Self& operator--();
 
 		// @brief 後置デクリメント
-		Self operator--(int) {
-			Self temp = *this;
-			--(*this);
-			return temp;
-		}
+		Self operator--(int);
 
 		// @brief データへの参照(const版)
-		const T& operator*() const {
-			// アサートチェック
-			assert(m_pCurrent != nullptr);
-			assert(m_pCurrent != &m_pOwner->m_Dummy);
-			// データを返す
-			return m_pCurrent->m_Data;
-		}
+		const T& operator*() const;
 
 		// @brief ポインタアクセス
-		const T* operator->() const {
-			// アサートチェック
-			assert(m_pCurrent != nullptr);
-			assert(m_pCurrent != &m_pOwner->m_Dummy);
-			// データを返す
-			return &(m_pCurrent->m_Data);
-		}
+		const T* operator->() const;
 
 		// @brief 代入演算子
-		const Self& operator=(const Self& other) {
-			// 自分自身への代入でないことを確認
-			if (this != &other) {
-				m_pCurrent = other.m_pCurrent;
-				m_pOwner = other.m_pOwner;
-			}
-			return *this;
-		}
+		// @param other 代入元のイテレーター
+		const Self& operator=(const Self& other);
 
 		// @brief 比較演算子
-		bool operator==(Self& other) {
-			return m_pCurrent == other.m_pCurrent;
-		}
+		// @param other 比較するイテレーター
+		bool operator==(Self& other);
 		// @brief 比較演算子(const版)
-		bool operator==(const Self& other) const {
-			return m_pCurrent == other.m_pCurrent;
-		}
+		// @param other 比較するイテレーター
+		bool operator==(const Self& other) const;
 
 		// @brief 不等比較演算子
-		bool operator!=(Self& other) {
-			return !(*this == other);
-		}
+		// @param other 比較するイテレーター
+		bool operator!=(Self& other);
 		// @brief 不等比較演算子(const版)
-		bool operator!=(const Self& other) const {
-			return !(*this == other);
-		}
+		// @param other 比較するイテレーター
+		bool operator!=(const Self& other) const;
 
 		// @brief 所属するリストを取得
-		const List* owner()const {
-			return m_pOwner;
-		}
+		const List* owner()const;
 	protected:
 		// @brief 現在のノード
 		Node* m_pCurrent;
@@ -159,8 +106,7 @@ private:
 	};
 
 	// @brief 双方向リスト用イテレーター
-	template<typename T>
-	class InteractiveIterator : public InteractiveConstIterator<T>
+	class InteractiveIterator : public InteractiveConstIterator
 	{
 		// リストクラスをフレンドに設定
 		friend class InteractiveList<T>;
@@ -169,47 +115,34 @@ private:
 		// 型エイリアス
 		using Node = InteractiveNode;
 		using List = InteractiveList<T>;
-		using Self = InteractiveIterator<T>;
-		using Base = InteractiveConstIterator<T>;
+		using Self = InteractiveIterator;
+		using Base = InteractiveConstIterator;
 	public:
 
 		// @brief デフォルトコンストラクタ
-		InteractiveIterator() : Base() {
-		}
+		InteractiveIterator();
 
 		// @brief コンストラクタ
-		InteractiveIterator(Node* node, List* owner) : Base(node, owner) {
-		}
+		// @param node ノードポインタ
+		// @param owner 所属するリストポインタ
+		InteractiveIterator(Node* node, List* owner);
 
 		// @brief コピーコンストラクタ
-		InteractiveIterator(const Self& other) : Base(other) {
-		}
+		InteractiveIterator(const Self& other);
 
 
 		// @brief データへの参照(非const版)
-		T& operator* () {
-			// アサートチェック
-			assert(Base::m_pCurrent != nullptr);
-			assert(Base::m_pCurrent != &Base::m_pOwner->m_Dummy);
-			// データを返す
-			return Base::m_pCurrent->m_Data;
-		}
+		T& operator* ();
 
 		// @brief データへの参照(非const版)
-		T* operator->() {
-			// アサートチェック
-			assert(Base::m_pCurrent != nullptr);
-			assert(Base::m_pCurrent != &Base::m_pOwner->m_Dummy);
-			// データを返す
-			return &(Base::m_pCurrent->m_Data);
-		}
+		T* operator->();
 	};
 
 public:
 	// 型エイリアス
 	using Node = InteractiveNode;
-	using Iterator = InteractiveIterator<T>;
-	using const_Iterator = InteractiveConstIterator<T>;
+	using Iterator = InteractiveIterator;
+	using const_Iterator = InteractiveConstIterator;
 
 	// @brief コンストラクタ
 	InteractiveList();
@@ -265,9 +198,12 @@ public:
 	Iterator rend();
 
 	// @brief 要素の削除
+	// @param pos 削除する要素のイテレーター
 	bool erase(const_Iterator pos);
 
 	// @brief 要素の挿入
+	// @param pos 挿入する位置のイテレーター
+	// @param value 挿入するデータ
 	bool insert(const_Iterator pos, const T& value);
 	
 private:

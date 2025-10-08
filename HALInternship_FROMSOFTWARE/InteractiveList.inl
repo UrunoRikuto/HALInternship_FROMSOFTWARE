@@ -6,10 +6,245 @@
 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
 #include "InteractiveList.h"
 
+/***************************************************************
+*	
+* InteractiveNode構造体のメンバ関数
+* 
+****************************************************************/
+
+// @brief InteractiveNodeのデフォルトコンストラクタ
+template<typename T>
+inline InteractiveList<T>::InteractiveNode::InteractiveNode()
+	: m_pPrevData(nullptr)
+	, m_pNextData(nullptr)
+	, m_Data() 
+{
+}
+
+// @brief InteractiveNodeのコンストラクタ
+// @param In_Value ノードに格納するデータ
+template<typename T>
+inline InteractiveList<T>::InteractiveNode::InteractiveNode(const T& In_Value)
+	:m_Data(In_Value)
+	, m_pPrevData(nullptr)
+	, m_pNextData(nullptr)
+{
+}
+
+// @brief InteractiveNodeのデストラクタ
+template<typename T>
+inline InteractiveList<T>::InteractiveNode::~InteractiveNode()
+{
+	m_pPrevData = nullptr;
+	m_pNextData = nullptr;
+}
+
+/***************************************************************
+* 
+* InteractiveConstIteratorクラスのメンバ関数
+* 
+***************************************************************/
+
+// @brief デフォルトコンストラクタ
+template<typename T>
+inline InteractiveList<T>::InteractiveConstIterator::InteractiveConstIterator()
+	: m_pCurrent(nullptr)
+	, m_pOwner(nullptr)
+{
+}
+
+// @brief コンストラクタ
+// @param node ノードポインタ
+// @param owner 所属するリストポインタ
+template<typename T>
+inline InteractiveList<T>::InteractiveConstIterator::InteractiveConstIterator(const Node* node, const List* owner)
+{
+	m_pCurrent = const_cast<Node*>(node);
+	m_pOwner = const_cast<List*>(owner);
+}
+
+// @brief コピーコンストラクタ
+// @param other コピー元のイテレーター
+template<typename T>
+inline InteractiveList<T>::InteractiveConstIterator::InteractiveConstIterator(const Self& other)
+{
+	m_pCurrent = other.m_pCurrent;
+	m_pOwner = other.m_pOwner;
+}
+
+// @brief 前置インクリメント
+template<typename T>
+inline typename InteractiveList<T>::InteractiveConstIterator::Self& InteractiveList<T>::InteractiveConstIterator::operator++()
+{
+	// アサートチェック
+	assert(m_pCurrent != nullptr);
+	assert(m_pCurrent != &m_pOwner->m_Dummy);
+	// 次のノードへ移動
+	if (m_pCurrent) m_pCurrent = m_pCurrent->m_pNextData;
+	return *this;
+}
+
+// @brief 後置インクリメント
+template<typename T>
+inline typename InteractiveList<T>::InteractiveConstIterator::Self InteractiveList<T>::InteractiveConstIterator::operator++(int)
+{
+	Self temp = *this;
+	++(*this);
+	return temp;
+}
+
+// @brief 前置デクリメント
+template<typename T>
+inline typename InteractiveList<T>::InteractiveConstIterator::Self& InteractiveList<T>::InteractiveConstIterator::operator--()
+{
+	// アサートチェック
+	assert(m_pCurrent != nullptr);
+	assert(m_pCurrent != &m_pOwner->m_Dummy);
+	// 前のノードへ移動
+	if (m_pCurrent) m_pCurrent = m_pCurrent->m_pPrevData;
+	return *this;
+}
+
+// @brief 後置デクリメント
+template<typename T>
+inline typename InteractiveList<T>::InteractiveConstIterator::Self InteractiveList<T>::InteractiveConstIterator::operator--(int)
+{
+	Self temp = *this;
+	--(*this);
+	return temp;
+}
+
+// @brief データへの参照(const版)
+template<typename T>
+inline const T& InteractiveList<T>::InteractiveConstIterator::operator*() const
+{
+	// アサートチェック
+	assert(m_pCurrent != nullptr);
+	assert(m_pCurrent != &m_pOwner->m_Dummy);
+	// データを返す
+	return m_pCurrent->m_Data;
+}
+
+// @brief ポインタアクセス
+template<typename T>
+inline const T* InteractiveList<T>::InteractiveConstIterator::operator->() const
+{
+	// アサートチェック
+	assert(m_pCurrent != nullptr);
+	assert(m_pCurrent != &m_pOwner->m_Dummy);
+	// データを返す
+	return &(m_pCurrent->m_Data);
+}
+
+// @brief 代入演算子
+template<typename T>
+inline const typename InteractiveList<T>::InteractiveConstIterator::Self& InteractiveList<T>::InteractiveConstIterator::operator=(const Self& other)
+{
+	// 自分自身への代入でないことを確認
+	if (this != &other) {
+		m_pCurrent = other.m_pCurrent;
+		m_pOwner = other.m_pOwner;
+	}
+	return *this;
+}
+
+// @brief 等価演算子
+template<typename T>
+inline bool InteractiveList<T>::InteractiveConstIterator::operator==(Self& other)
+{
+	return m_pCurrent == other.m_pCurrent;
+}
+
+// @brief 等価演算子(const版)
+template<typename T>
+inline bool InteractiveList<T>::InteractiveConstIterator::operator==(const Self& other) const
+{
+	return m_pCurrent == other.m_pCurrent;
+}
+
+// @brief 不等比較演算子
+template<typename T>
+inline bool InteractiveList<T>::InteractiveConstIterator::operator!=(Self& other)
+{
+	return !(*this == other);
+}
+
+// @brief 不等比較演算子(const版)
+template<typename T>
+inline bool InteractiveList<T>::InteractiveConstIterator::operator!=(const Self& other) const
+{
+	return !(*this == other);
+}
+
+// @brief 所属するリストを取得
+template<typename T>
+inline const typename InteractiveList<T>::InteractiveConstIterator::List* InteractiveList<T>::InteractiveConstIterator::owner() const
+{
+	return m_pOwner;
+}
+
+/***************************************************************
+* 
+* InteractiveIteratorクラスのメンバ関数
+* 
+***************************************************************/
+
+// @brief デフォルトコンストラクタ
+template<typename T>
+inline InteractiveList<T>::InteractiveIterator::InteractiveIterator()
+	: Base()
+{
+}
+
+// @brief コンストラクタ
+// @param node ノードポインタ
+// @param owner 所属するリストポインタ
+template<typename T>
+inline InteractiveList<T>::InteractiveIterator::InteractiveIterator(Node* node, List* owner)
+	: Base(node, owner)
+{
+}
+
+// @brief コピーコンストラクタ
+// @param other コピー元のイテレーター
+template<typename T>
+inline InteractiveList<T>::InteractiveIterator::InteractiveIterator(const Self& other)
+	: Base(other)
+{
+}
+
+// @brief データへの参照(非const版)
+template<typename T>
+inline T& InteractiveList<T>::InteractiveIterator::operator*()
+{
+	// アサートチェック
+	assert(Base::m_pCurrent != nullptr);
+	assert(Base::m_pCurrent != &Base::m_pOwner->m_Dummy);
+	// データを返す
+	return Base::m_pCurrent->m_Data;
+}
+
+// @brief データへの参照(非const版)
+template<typename T>
+inline T* InteractiveList<T>::InteractiveIterator::operator->()
+{
+	// アサートチェック
+	assert(Base::m_pCurrent != nullptr);
+	assert(Base::m_pCurrent != &Base::m_pOwner->m_Dummy);
+	// データを返す
+	return &(Base::m_pCurrent->m_Data);
+}
+
+/***************************************************************
+*
+* InteractiveList<T>クラスのメンバ関数
+*
+***************************************************************/
+
 // @brief コンストラクタ
 template<typename T>
-InteractiveList<T>::InteractiveList() 
-	:m_Size(0) 
+inline InteractiveList<T>::InteractiveList()
+	:m_Size(0)
 {
 	m_Dummy.m_pNextData = m_Dummy.m_pPrevData = &m_Dummy;
 }
@@ -171,7 +406,7 @@ inline void InteractiveList<T>::popBack()
 // @brief 先頭のconst版イテレーターの取得
 // @return 先頭のコンストイレーター
 template<typename T>
-inline const InteractiveList<T>::InteractiveConstIterator<T> InteractiveList<T>::cbegin() const
+inline  const typename InteractiveList<T>::const_Iterator InteractiveList<T>::cbegin() const
 {
 	return const_Iterator(m_Dummy.m_pNextData, this);
 }
@@ -179,7 +414,7 @@ inline const InteractiveList<T>::InteractiveConstIterator<T> InteractiveList<T>:
 // @brief 先頭の非const版イテレーターの取得
 // @return 先頭のイテレーター
 template<typename T>
-inline InteractiveList<T>::InteractiveIterator<T> InteractiveList<T>::begin()
+inline typename InteractiveList<T>::Iterator InteractiveList<T>::begin()
 {
 	return Iterator(m_Dummy.m_pNextData, this);
 }
@@ -187,7 +422,7 @@ inline InteractiveList<T>::InteractiveIterator<T> InteractiveList<T>::begin()
 // @brief 末尾のconst版イテレーターの取得
 // @return 末尾のコンストイテレーター
 template<typename T>
-inline const InteractiveList<T>::InteractiveConstIterator<T> InteractiveList<T>::cend() const
+inline const typename InteractiveList<T>::const_Iterator InteractiveList<T>::cend() const
 {
 	if (!isEmpty())
 	{
@@ -199,7 +434,7 @@ inline const InteractiveList<T>::InteractiveConstIterator<T> InteractiveList<T>:
 // @brief 末尾の非const版イテレーターの取得
 // @return 末尾のイテレーター
 template<typename T>
-inline InteractiveList<T>::InteractiveIterator<T> InteractiveList<T>::end()
+inline typename InteractiveList<T>::Iterator InteractiveList<T>::end()
 {
 	if (!isEmpty())
 	{
@@ -211,7 +446,7 @@ inline InteractiveList<T>::InteractiveIterator<T> InteractiveList<T>::end()
 // @brief 逆方向の先頭のconst版イテレーターの取得
 // @return 逆方向の先頭のコンストイテレーター
 template<typename T>
-inline const InteractiveList<T>::InteractiveConstIterator<T> InteractiveList<T>::crbegin() const
+inline const typename InteractiveList<T>::const_Iterator InteractiveList<T>::crbegin() const
 {
 	return const_Iterator(m_Dummy.m_pPrevData, this);
 }
@@ -219,7 +454,7 @@ inline const InteractiveList<T>::InteractiveConstIterator<T> InteractiveList<T>:
 // @brief 逆方向の先頭の非const版イテレーターの取得
 // @return 逆方向の先頭のイテレーター
 template<typename T>
-inline InteractiveList<T>::InteractiveIterator<T> InteractiveList<T>::rbegin()
+inline typename InteractiveList<T>::Iterator InteractiveList<T>::rbegin()
 {
 	return Iterator(m_Dummy.m_pPrevData, this);
 }
@@ -227,7 +462,7 @@ inline InteractiveList<T>::InteractiveIterator<T> InteractiveList<T>::rbegin()
 // @brief 逆方向の末尾のconst版イテレーターの取得
 // @return 逆方向の末尾のコンストイレーター
 template<typename T>
-inline const InteractiveList<T>::InteractiveConstIterator<T> InteractiveList<T>::crend() const
+inline const typename InteractiveList<T>::const_Iterator InteractiveList<T>::crend() const
 {
 	if (!isEmpty())
 	{
@@ -236,8 +471,10 @@ inline const InteractiveList<T>::InteractiveConstIterator<T> InteractiveList<T>:
 	return const_Iterator(&m_Dummy, this);
 }
 
+// @brief 逆方向の末尾の非const版イテレーターの取得
+// @return 逆方向の末尾のイテレーター
 template<typename T>
-inline InteractiveList<T>::InteractiveIterator<T> InteractiveList<T>::rend()
+inline typename InteractiveList<T>::Iterator InteractiveList<T>::rend()
 {
 	if (!isEmpty())
 	{
