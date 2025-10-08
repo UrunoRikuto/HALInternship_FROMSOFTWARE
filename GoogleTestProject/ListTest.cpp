@@ -821,9 +821,11 @@ namespace Iterator
 		// リスト参照なしイテレーターを作成
 		InteractiveList<int>::Iterator it;
 		// Assert発生を確認
+#ifdef _DEBUG
 		EXPECT_DEATH({
 			(*it);
 			}, "Assertion failed.*");
+#endif // _DEBUG
 	}
 	// 項　目：イテレーターから取得した要素に対して値の代入を行えるかチェック
 	// 理　想：代入できる
@@ -867,9 +869,11 @@ namespace Iterator
 		// 先頭イテレーターを取得
 		InteractiveList<int>::Iterator it = list.begin();
 		// Assert発生を確認
+#ifdef _DEBUG
 		EXPECT_DEATH({
 			(*it);
 			}, "Assertion failed.*");
+#endif // _DEBUG
 	}
 	// 項　目：リストが空の際に末尾イテレーターに対して呼び出した際の挙動
 	// 理　想：Assert発生
@@ -880,9 +884,11 @@ namespace Iterator
 		// 末尾イテレーターを取得
 		InteractiveList<int>::Iterator it = list.end();
 		// Assert発生を確認
+#ifdef _DEBUG
 		EXPECT_DEATH({
 			(*it);
 			}, "Assertion failed.*");
+#endif // _DEBUG
 	}
 
 	// ============================ イテレーターを末尾に向かって一つ進める =============================//
@@ -893,9 +899,11 @@ namespace Iterator
 		// リスト参照なしイテレーターを作成
 		InteractiveList<int>::Iterator it;
 		// Assert発生を確認
+#ifdef _DEBUG
 		EXPECT_DEATH({
 			it++;
 			}, "Assertion failed.*");
+#endif // _DEBUG
 	}
 	// 項　目：リストが空の際に先頭イテレーターに対して呼び出した際の挙動
 	// 理　想：Assert発生
@@ -906,9 +914,11 @@ namespace Iterator
 		// 先頭イテレーターを取得
 		InteractiveList<int>::Iterator it = list.begin();
 		// Assert発生を確認
+#ifdef _DEBUG
 		EXPECT_DEATH({
 			it++;
 			}, "Assertion failed.*");
+#endif // _DEBUG
 	}
 	// 項　目：リストが空の際に末尾イテレーターに対して呼び出した際の挙動
 	// 理　想：Assert発生
@@ -919,9 +929,12 @@ namespace Iterator
 		// 末尾イテレーターを取得
 		InteractiveList<int>::Iterator it = list.end();
 		// Assert発生を確認
+#ifdef _DEBUG
 		EXPECT_DEATH({
-			it++;
+	it++;
 			}, "Assertion failed.*");
+
+#endif // _DEBUG
 	}
 	// 項　目：リストに複数の要素があるときに呼び出したときの挙動
 	// 理　想：イテレーターが一つ進む
@@ -986,9 +999,11 @@ namespace Iterator
 		// リスト参照なしイテレーターを作成
 		InteractiveList<int>::Iterator it;
 		// Assert発生を確認
+#ifdef _DEBUG
 		EXPECT_DEATH({
 			it--;
 			}, "Assertion failed.*");
+#endif // _DEBUG
 	}
 	// 項　目：リストが空の際に末尾イテレーターに対して呼び出した際の挙動
 	// 理　想：Assert発生
@@ -999,9 +1014,11 @@ namespace Iterator
 		// 末尾イテレーターを取得
 		InteractiveList<int>::Iterator it = list.end();
 		// Assert発生を確認
+#ifdef _DEBUG
 		EXPECT_DEATH({
 			it--;
 			}, "Assertion failed.*");
+#endif // _DEBUG
 	}
 	// 項　目：リストが空の際に先頭イテレーターに対して呼び出した際の挙動
 	// 理　想：Assert発生
@@ -1012,9 +1029,11 @@ namespace Iterator
 		// 先頭イテレーターを取得
 		InteractiveList<int>::Iterator it = list.begin();
 		// Assert発生を確認
+#ifdef _DEBUG
 		EXPECT_DEATH({
 			it--;
 			}, "Assertion failed.*");
+#endif // _DEBUG
 	}
 	// 項　目：リストに複数の要素があるときに呼び出したときの挙動
 	// 理　想：イテレーターが一つ戻る
