@@ -22,9 +22,12 @@ int main(void)
 		[](const DataParam& d) {return d.m_nScore; });
 
 	// リストの内容を表示
+	InteractiveList<DataParam>::const_Iterator itEnd = list.cend();
+	itEnd++;
 	// イテレーターを使ってリストの各要素にアクセス
-	for (const auto& data : list)
+	for (auto it = list.cbegin(); it != itEnd; ++it)
 	{
+		const DataParam& data = *it;
 		std::cout <<
 			"Score: " << data.m_nScore
 			<< ", " <<

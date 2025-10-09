@@ -605,7 +605,6 @@ inline void InteractiveList<T>::swap(const_Iterator NodeA, const_Iterator NodeB)
 	NodeB.m_pCurrent->m_Data = tempData;
 }
 
-
 /***************************************************************
 *
 * ソートプログラムの実装

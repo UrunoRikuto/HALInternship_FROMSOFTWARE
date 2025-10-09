@@ -818,6 +818,8 @@ namespace List
 		// クイックソートを実行
 		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
 			[](const int& d) {return d; });
+
+		EXPECT_EQ(list.getSize(), 0);
 	}
 	// 項　目：リストに要素が一つある場合に、クイックソートを実行した際の挙動
 	// 理　想：何も起こらず正常終了
@@ -992,7 +994,7 @@ namespace List
 	}
 	// 項　目：型などが不適切なキー指定が引数できた場合の挙動
 	// 理　想：コンパイルエラーになる
-	TEST(ListQuickSortXX, TestQuickSortWhenInvalidKey)
+	TEST(ListQuickSort, TestQuickSortWhenInvalidKey)
 	{
 #if defined TT_TEST_QUICK_SORT_WHEN_INVALID_KEY
 		// リストを作成
@@ -1003,7 +1005,7 @@ namespace List
 		list.pushBack(2);
 		// クイックソートを実行
 		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
-			[](const char& d) {return d; });//ここでエラー
+			[](const std::string& d) {return d; });//ここでエラー
 #endif //TT_TEST_QUICK_SORT_WHEN_INVALID_KEY
 		SUCCEED();
 	}
