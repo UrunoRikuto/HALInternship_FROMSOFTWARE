@@ -735,22 +735,19 @@ inline void InteractiveList<T>::_reverse()
 {
 	// リストが空の場合は処理しない
 	if (isEmpty()) return;
-	Node* current = m_Dummy.m_pNextData;
-	Node* temp = nullptr;
-	// ノードを反転
-	while (current != &m_Dummy)
+
+	// 先頭イテレーターと末尾イテレーターを取得
+	Iterator left = begin();
+	Iterator right = end();
+	// leftがrightの前のノードでない限り処理を続行
+	while (left.m_pCurrent != right.m_pCurrent && left.m_pCurrent != right.m_pCurrent->m_pNextData)
 	{
-		// 前後のノードを入れ替え
-		temp = current->m_pPrevData;
-		current->m_pPrevData = current->m_pNextData;
-		current->m_pNextData = temp;
-		// 次のノードへ移動
-		current = current->m_pPrevData;
+		// leftとrightのデータを交換
+		swap(left, right);
+		// leftを1つ進める
+		++left;
+		// rightを1つ戻す
+		--right;
 	}
-	// 先頭と末尾を入れ替え
-	if (temp != nullptr)
-	{
-		m_Dummy.m_pPrevData = m_Dummy.m_pNextData;
-		m_Dummy.m_pNextData = temp->m_pPrevData;
-	}
+
 }
