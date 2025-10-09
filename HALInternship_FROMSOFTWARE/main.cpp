@@ -25,6 +25,7 @@ int main(void)
 	InteractiveList<DataParam>::const_Iterator itEnd = list.cend();
 	itEnd++;
 	// イテレーターを使ってリストの各要素にアクセス
+	std::cout << "＝＝＝＝＝クイックソート「スコア(昇順)」＝＝＝＝＝" << std::endl;
 	for (auto it = list.cbegin(); it != itEnd; ++it)
 	{
 		const DataParam& data = *it;
@@ -34,6 +35,64 @@ int main(void)
 			"Name: " << data.m_Name 
 			<< std::endl;
 	}
+
+	// リストのソート
+	list.sort(SortAlgorithm::QuickSort, SortOrder::Descending,
+		[](const DataParam& d) {return d.m_nScore; });
+
+	// リストの内容を表示
+	itEnd = list.cend();
+	itEnd++;
+	// イテレーターを使ってリストの各要素にアクセス
+	std::cout << "＝＝＝＝＝クイックソート「スコア(降順)」＝＝＝＝＝" << std::endl;
+	for (auto it = list.cbegin(); it != itEnd; ++it)
+	{
+		const DataParam& data = *it;
+		std::cout <<
+			"Score: " << data.m_nScore
+			<< ", " <<
+			"Name: " << data.m_Name
+			<< std::endl;
+	}
+
+	// リストのソート
+	list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+		[](const DataParam& d) {return d.m_Name; });
+
+	// リストの内容を表示
+	itEnd = list.cend();
+	itEnd++;
+	// イテレーターを使ってリストの各要素にアクセス
+	std::cout << "＝＝＝＝＝クイックソート「名前(昇順)」＝＝＝＝＝" << std::endl;
+	for (auto it = list.cbegin(); it != itEnd; ++it)
+	{
+		const DataParam& data = *it;
+		std::cout <<
+			"Score: " << data.m_nScore
+			<< ", " <<
+			"Name: " << data.m_Name
+			<< std::endl;
+	}
+
+	// リストのソート
+	list.sort(SortAlgorithm::QuickSort, SortOrder::Descending,
+		[](const DataParam& d) {return d.m_Name; });
+
+	// リストの内容を表示
+	itEnd = list.cend();
+	itEnd++;
+	// イテレーターを使ってリストの各要素にアクセス
+	std::cout << "＝＝＝＝＝クイックソート「名前(降順)」＝＝＝＝＝" << std::endl;
+	for (auto it = list.cbegin(); it != itEnd; ++it)
+	{
+		const DataParam& data = *it;
+		std::cout <<
+			"Score: " << data.m_nScore
+			<< ", " <<
+			"Name: " << data.m_Name
+			<< std::endl;
+	}
+
 
 	// プログラム終了
 	return 0;
