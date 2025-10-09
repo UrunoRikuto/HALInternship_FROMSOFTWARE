@@ -17,18 +17,23 @@ int main(void)
 		std::cout << "ファイルの読み込みに失敗しました。" << std::endl;
 	}
 
+	// リストのソート
+	list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+		[](const DataParam& d) {return d.m_nScore; });
+
 	// リストの内容を表示
+	InteractiveList<DataParam>::const_Iterator itEnd = list.cend();
+	itEnd++;
 	// イテレーターを使ってリストの各要素にアクセス
-	for (const auto& data : list)
+	for (auto it = list.cbegin(); it != itEnd; ++it)
 	{
+		const DataParam& data = *it;
 		std::cout <<
 			"Score: " << data.m_nScore
 			<< ", " <<
 			"Name: " << data.m_Name 
 			<< std::endl;
 	}
-
-	list.clear();
 
 	// プログラム終了
 	return 0;

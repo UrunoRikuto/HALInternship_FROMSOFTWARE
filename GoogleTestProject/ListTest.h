@@ -36,6 +36,14 @@
 * ※コンパイルが通れば成功*/
 //#define TT_TEST_CONST_END_WHEN_CONST
 
+/* 型が不適切なキーでソートを行った際の挙動
+* ※コンパイルが通らなければ成功*/
+//#define TT_TEST_QUICK_SORT_WHEN_INVALID_KEY
+
+/* 非constのメソッドであるか(クイックソート)
+* ※コンパイルが通らなければ成功*/
+//#define TT_TEST_QUICK_SORT_WHEN_CONST
+
 /**＝＝＝＝＝＝＝＝＝＝＝ イテレーターテスト ＝＝＝＝＝＝＝＝＝＝＝**/
 
 /* const版イテレーターで値の取得を行った際に、値の代入ができないか

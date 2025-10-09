@@ -808,6 +808,221 @@ namespace List
 		SUCCEED();
 	}
 
+	// ============================= クイックソート =============================//
+	// 項　目：リストが空である場合に、クイックソートを実行した際の挙動
+	// 理　想：何も起こらず正常終了
+	TEST(ListQuickSort, TestQuickSortWhenEmpty)
+	{
+		// リストを作成
+		InteractiveList<int> list;
+		// クイックソートを実行
+		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+			[](const int& d) {return d; });
+
+		EXPECT_EQ(list.getSize(), 0);
+	}
+	// 項　目：リストに要素が一つある場合に、クイックソートを実行した際の挙動
+	// 理　想：何も起こらず正常終了
+	TEST(ListQuickSort, TestQuickSortWhenHaveOneData)
+	{
+		// リストを作成
+		InteractiveList<int> list;
+		// リストにデータを挿入
+		list.pushBack(1);
+		// クイックソートを実行
+		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+			[](const int& d) {return d; });
+
+		// 先頭イテレーターを取得
+		InteractiveList<int>::Iterator it = list.begin();
+		// 取得したイテレーターが先頭の要素を指していることを確認
+		EXPECT_EQ((*it), 1);
+	}
+	// 項　目：リストに複数の要素がある場合に、クイックソートを実行した際の挙動
+	// 理　想：昇順にソートされる
+	TEST(ListQuickSort, TestQuickSortWhenHaveMultipleData)
+	{
+		// リストを作成
+		InteractiveList<int> list;
+		// リストにデータを挿入
+		list.pushBack(3);
+		list.pushBack(1);
+		list.pushBack(2);
+		// クイックソートを実行
+		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+			[](const int& d) {return d; });
+		// 先頭イテレーターを取得
+		InteractiveList<int>::Iterator it = list.begin();
+		// データが1,2,3の順であることを確認
+		EXPECT_EQ((*it), 1);
+		it++;
+		EXPECT_EQ((*it), 2);
+		it++;
+		EXPECT_EQ((*it), 3);
+	}
+	// 項　目：同じキーを持つ要素がある場合に、そのキーを指定してクイックソートを実行した際の挙動
+	// 理　想：要素がソートされるが、同じキーの要素の順序は保障されない
+	TEST(ListQuickSort, TestQuickSortWhenHaveSameKeyData)
+	{
+		// リストを作成
+		InteractiveList<int> list;
+		// リストにデータを挿入
+		list.pushBack(3);
+		list.pushBack(1);
+		list.pushBack(2);
+		list.pushBack(3);
+		list.pushBack(2);
+		list.pushBack(1);
+		// クイックソートを実行
+		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+			[](const int& d) {return d; });
+		// 先頭イテレーターを取得
+		InteractiveList<int>::Iterator it = list.begin();
+		// データが1,1,2,2,3,3の順であることを確認
+		EXPECT_EQ((*it), 1);
+		it++;
+		EXPECT_EQ((*it), 1);
+		it++;
+		EXPECT_EQ((*it), 2);
+		it++;
+		EXPECT_EQ((*it), 2);
+		it++;
+		EXPECT_EQ((*it), 3);
+		it++;
+		EXPECT_EQ((*it), 3);
+	}
+	// 項　目：整列済みのリストに対してクイックソートを実行した際の挙動
+	// 理　想：同じキーの要素以外は順序が変わらない
+	TEST(ListQuickSort, TestQuickSortWhenAlreadySorted)
+	{
+		// リストを作成
+		InteractiveList<int> list;
+		// リストにデータを挿入
+		list.pushBack(1);
+		list.pushBack(1);
+		list.pushBack(2);
+		list.pushBack(2);
+		list.pushBack(3);
+		list.pushBack(3);
+		// クイックソートを実行
+		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+			[](const int& d) {return d; });
+		// 先頭イテレーターを取得
+		InteractiveList<int>::Iterator it = list.begin();
+		// データが1,1,2,2,3,3の順であることを確認
+		EXPECT_EQ((*it), 1);
+		it++;
+		EXPECT_EQ((*it), 1);
+		it++;
+		EXPECT_EQ((*it), 2);
+		it++;
+		EXPECT_EQ((*it), 2);
+		it++;
+		EXPECT_EQ((*it), 3);
+		it++;
+		EXPECT_EQ((*it), 3);
+	}
+	// 項　目：一度整列下リストの各所に要素を挿入した後にクイックソートを実行した際の挙動
+	// 理　想：要素がソートされる
+	TEST(ListQuickSort, TestQuickSortAfterInsertInSortedList)
+	{
+		// リストを作成
+		InteractiveList<int> list;
+		// リストにデータを挿入
+		list.pushBack(1);
+		list.pushBack(1);
+		list.pushBack(2);
+		list.pushBack(2);
+		list.pushBack(3);
+		list.pushBack(3);
+		// 先頭イテレーターを取得
+		InteractiveList<int>::Iterator it = list.begin();
+		// 各所に要素を挿入
+		it++;
+		list.insert(it, 4);//1と1の間に4を挿入
+		it++;
+		it++;
+		list.insert(it, 0);//2と2の間に0を挿入
+		it++;
+		it++;
+		it++;
+		list.insert(it, 5);//3と3の間に5を挿入
+		// クイックソートを実行
+		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+			[](const int& d) {return d; });
+		// 先頭イテレーターを再取得
+		it = list.begin();
+		// データが0,1,1,2,2,3,3,4,5の順であることを確認
+		EXPECT_EQ((*it), 0);
+		it++;
+		EXPECT_EQ((*it), 1);
+		it++;
+		EXPECT_EQ((*it), 1);
+		it++;
+		EXPECT_EQ((*it), 2);
+		it++;
+		EXPECT_EQ((*it), 2);
+		it++;
+		EXPECT_EQ((*it), 3);
+		it++;
+		EXPECT_EQ((*it), 3);
+		it++;
+		EXPECT_EQ((*it), 4);
+		it++;
+		EXPECT_EQ((*it), 5);
+	}
+	// 項　目：キーを指定しなかった場合にクイックソートを実行した際の挙動
+	// 理　想：何も起こらず正常終了
+	TEST(ListQuickSort, TestQuickSortWhenNoKey)
+	{
+		// リストを作成
+		InteractiveList<int> list;
+		// リストにデータを挿入
+		list.pushBack(3);
+		list.pushBack(1);
+		list.pushBack(2);
+		// クイックソートを実行
+		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending, nullptr);
+		// 先頭イテレーターを取得
+		InteractiveList<int>::Iterator it = list.begin();
+		// データが3,1,2の順であることを確認
+		EXPECT_EQ((*it), 3);
+		it++;
+		EXPECT_EQ((*it), 1);
+		it++;
+		EXPECT_EQ((*it), 2);
+	}
+	// 項　目：型などが不適切なキー指定が引数できた場合の挙動
+	// 理　想：コンパイルエラーになる
+	TEST(ListQuickSort, TestQuickSortWhenInvalidKey)
+	{
+#if defined TT_TEST_QUICK_SORT_WHEN_INVALID_KEY
+		// リストを作成
+		InteractiveList<int> list;
+		// リストにデータを挿入
+		list.pushBack(3);
+		list.pushBack(1);
+		list.pushBack(2);
+		// クイックソートを実行
+		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+			[](const std::string& d) {return d; });//ここでエラー
+#endif //TT_TEST_QUICK_SORT_WHEN_INVALID_KEY
+		SUCCEED();
+	}
+	// 項　目：非constのメソッドであるか
+	// 理　想：コンパイルエラーになる
+	TEST(ListQuickSort, TestQuickSortWhenConst)
+	{
+#if defined TT_TEST_QUICK_SORT_WHEN_CONST
+		// const版リストを作成
+		const InteractiveList<int> list;
+		// クイックソートを実行
+		list.sort(InteractiveList<int>::SortAlgorithm::QuickSort, InteractiveList<int>::SortOrder::Ascending,
+			[](const int& d) {return d; });
+#endif //TT_TEST_QUICK_SORT_WHEN_CONST
+		SUCCEED();
+	}
+
 }// リストのテスト
 
 // イテレーターのテスト

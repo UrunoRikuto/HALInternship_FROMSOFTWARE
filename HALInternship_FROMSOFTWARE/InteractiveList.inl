@@ -5,6 +5,7 @@
 *
 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
 #include "InteractiveList.h"
+#include "File.h"
 
 /***************************************************************
 *	
@@ -246,7 +247,8 @@ template<typename T>
 inline InteractiveList<T>::InteractiveList()
 	:m_Size(0)
 {
-	m_Dummy.m_pNextData = m_Dummy.m_pPrevData = &m_Dummy;
+	m_Dummy.m_pNextData = &m_Dummy;
+	m_Dummy.m_pPrevData = &m_Dummy;
 }
 
 // @brief コピーコンストラクタ
@@ -576,4 +578,179 @@ inline bool InteractiveList<T>::insert(const_Iterator pos, const T& value)
 	// データ数を増やす
 	m_Size++;
 	return true;
+}
+
+// @brief ノードの入れ替え
+// @param NodeA ノードAのイテレーター
+// @param NodeB ノードBのイテレーター
+template<typename T>
+inline void InteractiveList<T>::swap(const_Iterator NodeA, const_Iterator NodeB)
+{
+	// リストが空の場合は処理しない
+	if (isEmpty()) return;
+
+	// アサートチェック
+	// 所属するリストが異なる場合は処理しない
+	if (NodeA.owner() != this) return;
+	if (NodeB.owner() != this) return;
+	// イテレーターがダミーノードを指している場合は処理しない
+	if (NodeA == const_Iterator(&m_Dummy, this)) return;
+	if (NodeB == const_Iterator(&m_Dummy, this)) return;
+	// 同じノードを指している場合は処理しない
+	if (NodeA == NodeB) return;
+
+	// ノードAとノードBのデータを交換
+	T tempData = NodeA.m_pCurrent->m_Data;
+	NodeA.m_pCurrent->m_Data = NodeB.m_pCurrent->m_Data;
+	NodeB.m_pCurrent->m_Data = tempData;
+}
+
+/***************************************************************
+*
+* ソートプログラムの実装
+*
+* [参考にしているサイト]
+* https://www.geeksforgeeks.org/dsa/cpp-program-for-quicksort-on-doubly-linked-list/
+* https://stackoverflow.com/questions/1382273/sorting-a-doubly-linked-list-c
+* https://qiita.com/seriru13/items/0605c17a162828b31e11
+*
+***************************************************************/
+
+// @brief ソート
+// @param type ソートアルゴリズム
+// @param order ソート順
+// @param key ソートキーを取得する関数オブジェクト
+template<typename T>
+template<typename KeySelector>
+inline void InteractiveList<T>::sort(SortAlgorithm type, SortOrder order, KeySelector key)
+{
+	// リストが空の場合は処理しない
+	if (isEmpty()) return;
+
+	// ソートアルゴリズムによって処理を分岐
+	switch (type)
+	{
+	case SortAlgorithm::QuickSort:
+		// クイックソートを実行
+		_quickSort(cbegin(), cend(), key);
+		break;
+	default:
+		break;
+	}
+
+	// 降順の場合はリストを反転
+	if (order == SortOrder::Descending)
+	{
+		// リストを反転
+		_reverse();
+	}
+}
+
+// @brief 2つのデータを比較し、aがbより小さいかどうかを判定
+// @param a 比較するデータ1
+// @param b 比較するデータ2
+// @param key 比較キーを取得する関数オブジェクト
+// @return aがbより小さい場合はtrue,そうでなければfalse
+template<typename T>
+template<typename KeySelector>
+inline constexpr auto InteractiveList<T>::_isLess(const T& a, const T& b, KeySelector key)
+-> decltype(key(a) < key(b), bool())
+{
+	return key(a) < key(b);
+}
+
+// @brief パーティション
+// @param start パーティションの開始イテレーター
+// @param end パーティションの終了イテレーター
+// @param key ソートキーを取得する関数オブジェクト
+// @return ピボットの位置のイテレーター
+template<typename T>
+template<typename KeySelector>
+inline typename InteractiveList<T>::const_Iterator InteractiveList<T>::_partition(const_Iterator start, const_Iterator end, KeySelector key)
+{
+	// ピボットを取得
+	T pivot = (*end);
+	// 開始イテレーターのノードを取得
+	Node* startNode = start.m_pCurrent;
+	// 終了イテレーターのノードを取得
+	Node* endNode = end.m_pCurrent;
+	// iを開始イテレーターの前のノードに設定
+	Node* i = startNode->m_pPrevData;
+
+	// jを開始イテレーターから終了イテレーターまでループ
+	for (Node* j = startNode; j != endNode; j = j->m_pNextData)
+	{
+		// jのデータがピボットより小さい場合
+		if (_isLess(j->m_Data, pivot, key))
+		{
+			// iを1つ進める
+			i = (i == nullptr) ? startNode : i->m_pNextData;
+			swap(const_Iterator(i, this), const_Iterator(j, this));
+		}
+	}
+
+	// iを1つ進める
+	i = (i == nullptr) ? startNode : i->m_pNextData;
+	swap(const_Iterator(i, this), end);
+
+	// ピボットの位置のイテレーターを返す
+	return const_Iterator(i, this);
+}
+
+// @brief クイックソート
+// @param start ソートの開始イテレーター
+// @param end ソートの終了イテレーター
+// @param key ソートキーを取得する関数オブジェクト
+template<typename T>
+template<typename KeySelector>
+inline void InteractiveList<T>::_quickSort(const_Iterator start, const_Iterator end, KeySelector key)
+{
+	// 開始位置と終了位置のイテレーターが所属するリストが異なる場合は処理しない
+	if (start.owner() != this || end.owner() != this) return;
+	// イテレーターがダミーノードを指している場合は処理しない
+	if (start == const_Iterator(&m_Dummy, this) || end == const_Iterator(&m_Dummy, this)) return;
+	// ノードがnullptrの場合、または開始位置と終了位置が同じ場合は処理しない
+	if (!start.m_pCurrent || !end.m_pCurrent || start == end) return;
+
+	// 開始ノードと終了ノードを取得
+	Node* startNode = start.m_pCurrent;
+	Node* endNode = end.m_pCurrent;
+
+	// 開始ノードが終了ノードの次のノードでない限り処理を続行
+	if (startNode != endNode->m_pNextData)
+	{
+		// パーティションを実行し、ピボットの位置を取得
+		Node* pivotNode = _partition(start, end, key).m_pCurrent;
+		// ピボットの前後で再帰的にクイックソートを実行
+		if (pivotNode && pivotNode->m_pPrevData)
+			_quickSort(start, const_Iterator(pivotNode->m_pPrevData, this), key);
+		if (pivotNode && pivotNode->m_pNextData)
+			_quickSort(const_Iterator(pivotNode->m_pNextData, this), end, key);
+	}
+}
+
+// @brief リストを反転
+template<typename T>
+inline void InteractiveList<T>::_reverse()
+{
+	// リストが空の場合は処理しない
+	if (isEmpty()) return;
+	Node* current = m_Dummy.m_pNextData;
+	Node* temp = nullptr;
+	// ノードを反転
+	while (current != &m_Dummy)
+	{
+		// 前後のノードを入れ替え
+		temp = current->m_pPrevData;
+		current->m_pPrevData = current->m_pNextData;
+		current->m_pNextData = temp;
+		// 次のノードへ移動
+		current = current->m_pPrevData;
+	}
+	// 先頭と末尾を入れ替え
+	if (temp != nullptr)
+	{
+		m_Dummy.m_pPrevData = m_Dummy.m_pNextData;
+		m_Dummy.m_pNextData = temp->m_pPrevData;
+	}
 }
