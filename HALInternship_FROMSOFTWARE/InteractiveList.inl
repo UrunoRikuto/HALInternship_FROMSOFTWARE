@@ -605,40 +605,44 @@ inline void InteractiveList<T>::swap(const_Iterator NodeA, const_Iterator NodeB)
 	NodeB.m_pCurrent->m_Data = tempData;
 }
 
+
+/***************************************************************
+*
+* ソートプログラムの実装
+*
+* [参考にしているサイト]
+* https://www.geeksforgeeks.org/dsa/cpp-program-for-quicksort-on-doubly-linked-list/
+* https://stackoverflow.com/questions/1382273/sorting-a-doubly-linked-list-c
+* https://qiita.com/seriru13/items/0605c17a162828b31e11
+*
+***************************************************************/
+
 // @brief ソート
 // @param type ソートアルゴリズム
 // @param order ソート順
+// @param key ソートキーを取得する関数オブジェクト
 template<typename T>
-template<typename U>
-inline void InteractiveList<T>::sort(SortAlgorithm type, SortOrder order)
+template<typename KeySelector>
+inline void InteractiveList<T>::sort(SortAlgorithm type, SortOrder order, KeySelector key)
 {
 	// リストが空の場合は処理しない
 	if (isEmpty()) return;
-	// 昇順ソートの場合
-	if (order == SortOrder::Ascending)
-	{
-		switch (type)
-		{
-		case SortAlgorithm::QuickSort:
-			_quickSort<U>(cbegin(), cend());
-			break;
-		default:
-			break;
-		}
-	}
-	// 降順ソートの場合
-	else if (order == SortOrder::Descending)
-	{
-		switch (type)
-		{
-		case SortAlgorithm::QuickSort:
-			_quickSort<U>(cbegin(), cend());			
-			break;
-		default:
-			break;
-		}
 
-		// ソート後にリストを反転
+	// ソートアルゴリズムによって処理を分岐
+	switch (type)
+	{
+	case SortAlgorithm::QuickSort:
+		// クイックソートを実行
+		_quickSort(cbegin(), cend(), key);
+		break;
+	default:
+		break;
+	}
+
+	// 降順の場合はリストを反転
+	if (order == SortOrder::Descending)
+	{
+		// リストを反転
 		_reverse();
 	}
 }
@@ -646,82 +650,33 @@ inline void InteractiveList<T>::sort(SortAlgorithm type, SortOrder order)
 // @brief 2つのデータを比較し、aがbより小さいかどうかを判定
 // @param a 比較するデータ1
 // @param b 比較するデータ2
-// @return aがbより小さい場合はtrue,それ以外はfalse
+// @param key 比較キーを取得する関数オブジェクト
+// @return aがbより小さい場合はtrue,そうでなければfalse
 template<typename T>
-template<typename U>
-inline bool InteractiveList<T>::_isLess(const T& a, const T& b)
+template<typename KeySelector>
+inline constexpr auto InteractiveList<T>::_isLess(const T& a, const T& b, KeySelector key)
+-> decltype(key(a) < key(b), bool())
 {
-	// 自前構造体の比較
-	if (typeid(T) == typeid(DataParam))
-	{
-		DataParam dataA = *(const DataParam*)(&a);
-		DataParam dataB = *(const DataParam*)(&b);
-
-		if (typeid(U) == typeid(int))
-		{
-			return dataA.m_nScore < dataB.m_nScore;
-		}
-		else if (typeid(U) == typeid(std::string))
-		{
-			const char* strA = dataA.m_Name.c_str();
-			const char* strB = dataB.m_Name.c_str();
-			while (*strA && (*strA == *strB))
-			{
-				++strA;
-				++strB;
-			}
-			return *(const unsigned char*)strA < *(const unsigned char*)strB;
-		}
-	}
-
-	// 型がint,float,doubleの場合のみ比較可能
-	if (typeid(U) == typeid(int) || typeid(U) == typeid(float))
-	{
-		// 型を変換して比較
-		float a = static_cast<float>(*(const float*)(&a));
-		float b = static_cast<float>(*(const float*)(&b));
-		return a < b;
-	}
-	// string や char* の場合は辞書順で比較
-	else if (typeid(U) == typeid(const char*) || typeid(U) == typeid(char*))
-	{
-		const char* a = (const char*)(&a);
-		const char* b = (const char*)(&b);
-		while (*a && (*a == *b))
-		{
-			++a;
-			++b;
-		}
-		return *(const unsigned char*)a < *(const unsigned char*)b;
-	}
-
-	return false;
+	return key(a) < key(b);
 }
 
 // @brief パーティション
 // @param start パーティションの開始イテレーター
 // @param end パーティションの終了イテレーター
+// @param key ソートキーを取得する関数オブジェクト
 // @return ピボットの位置のイテレーター
 template<typename T>
-template<typename U>
-inline typename InteractiveList<T>::const_Iterator InteractiveList<T>::_partition(const_Iterator start, const_Iterator end)
+template<typename KeySelector>
+inline typename InteractiveList<T>::const_Iterator InteractiveList<T>::_partition(const_Iterator start, const_Iterator end, KeySelector key)
 {
-	// ピボットを設定
 	T pivot = (*end);
-
-	// 開始のノードを取得
 	Node* startNode = start.m_pCurrent;
-	// 終了のノードを取得
 	Node* endNode = end.m_pCurrent;
-
-	// iをstartの前のノードに設定
 	Node* i = startNode->m_pPrevData;
 
-	// jをstartからendまでループ
 	for (Node* j = startNode; j != endNode; j = j->m_pNextData)
 	{
-		// ピボットより小さい場合
-		if (_isLess<U>(j->m_Data, pivot))
+		if (_isLess(j->m_Data, pivot, key))
 		{
 			i = (i == nullptr) ? startNode : i->m_pNextData;
 			swap(const_Iterator(i, this), const_Iterator(j, this));
@@ -730,47 +685,31 @@ inline typename InteractiveList<T>::const_Iterator InteractiveList<T>::_partitio
 
 	i = (i == nullptr) ? startNode : i->m_pNextData;
 	swap(const_Iterator(i, this), end);
-
 	return const_Iterator(i, this);
 }
 
 // @brief クイックソート
 // @param start ソートの開始イテレーター
 // @param end ソートの終了イテレーター
+// @param key ソートキーを取得する関数オブジェクト
 template<typename T>
-template<typename U>
-inline void InteractiveList<T>::_quickSort(const_Iterator start, const_Iterator end)
+template<typename KeySelector>
+inline void InteractiveList<T>::_quickSort(const_Iterator start, const_Iterator end, KeySelector key)
 {
-	// 所属するリストが異なる場合は処理しない
-	if (start.owner() != this)return;
-	if (end.owner() != this)return;
-	// イテレーターがダミーノードを指している場合は処理しない
-	if (start == const_Iterator(&m_Dummy, this)) return;
-	if (end == const_Iterator(&m_Dummy, this)) return;
-	if (!start.m_pCurrent)return;
-	if (!end.m_pCurrent)return;
-	// 同じノードを指している場合は処理しない
-	if (start == end)return;
+	if (start.owner() != this || end.owner() != this) return;
+	if (start == const_Iterator(&m_Dummy, this) || end == const_Iterator(&m_Dummy, this)) return;
+	if (!start.m_pCurrent || !end.m_pCurrent || start == end) return;
 
-	// 開始イテレーターのノードを取得
 	Node* startNode = start.m_pCurrent;
-	// 終了イテレーターのノードを取得
 	Node* endNode = end.m_pCurrent;
 
-	// 開始ノードが終了ノードの次のノードでない場合
 	if (startNode != endNode->m_pNextData)
 	{
-		Node* pivotNode = _partition<U>(start, end).m_pCurrent;
-		// ピボットの前のノードが存在する場合、ピボットの前までソート
+		Node* pivotNode = _partition(start, end, key).m_pCurrent;
 		if (pivotNode && pivotNode->m_pPrevData)
-		{
-			_quickSort<U>(start, const_Iterator(pivotNode->m_pPrevData, this));
-		}
-		// ピボットの次のノードが存在する場合、ピボットの次からソート
+			_quickSort(start, const_Iterator(pivotNode->m_pPrevData, this), key);
 		if (pivotNode && pivotNode->m_pNextData)
-		{
-			_quickSort<U>(const_Iterator(pivotNode->m_pNextData, this), end);
-		}
+			_quickSort(const_Iterator(pivotNode->m_pNextData, this), end, key);
 	}
 }
 
@@ -799,18 +738,3 @@ inline void InteractiveList<T>::_reverse()
 		m_Dummy.m_pNextData = temp->m_pPrevData;
 	}
 }
-
-/***************************************************************
-*
-* ソートプログラムの実装
-* 
-* 参考にしているサイト
-* https://www.geeksforgeeks.org/dsa/cpp-program-for-quicksort-on-doubly-linked-list/
-* https://stackoverflow.com/questions/1382273/sorting-a-doubly-linked-list-c
-* 
-* TODO:
-* |v|Swap関数
-* | |Partition関数
-* | |QuickSort関数
-*
-***************************************************************/

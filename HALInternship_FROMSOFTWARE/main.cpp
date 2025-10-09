@@ -18,7 +18,8 @@ int main(void)
 	}
 
 	// リストのソート
-	list.sort<int>(InteractiveList<DataParam>::SortAlgorithm::QuickSort, InteractiveList<DataParam>::SortOrder::Ascending);
+	list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+		[](const DataParam& d) {return d.m_nScore; });
 
 	// リストの内容を表示
 	// イテレーターを使ってリストの各要素にアクセス
