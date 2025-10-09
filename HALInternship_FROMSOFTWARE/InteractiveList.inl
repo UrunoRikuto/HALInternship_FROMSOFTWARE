@@ -669,22 +669,32 @@ template<typename T>
 template<typename KeySelector>
 inline typename InteractiveList<T>::const_Iterator InteractiveList<T>::_partition(const_Iterator start, const_Iterator end, KeySelector key)
 {
+	// ピボットを取得
 	T pivot = (*end);
+	// 開始イテレーターのノードを取得
 	Node* startNode = start.m_pCurrent;
+	// 終了イテレーターのノードを取得
 	Node* endNode = end.m_pCurrent;
+	// iを開始イテレーターの前のノードに設定
 	Node* i = startNode->m_pPrevData;
 
+	// jを開始イテレーターから終了イテレーターまでループ
 	for (Node* j = startNode; j != endNode; j = j->m_pNextData)
 	{
+		// jのデータがピボットより小さい場合
 		if (_isLess(j->m_Data, pivot, key))
 		{
+			// iを1つ進める
 			i = (i == nullptr) ? startNode : i->m_pNextData;
 			swap(const_Iterator(i, this), const_Iterator(j, this));
 		}
 	}
 
+	// iを1つ進める
 	i = (i == nullptr) ? startNode : i->m_pNextData;
 	swap(const_Iterator(i, this), end);
+
+	// ピボットの位置のイテレーターを返す
 	return const_Iterator(i, this);
 }
 
@@ -696,16 +706,23 @@ template<typename T>
 template<typename KeySelector>
 inline void InteractiveList<T>::_quickSort(const_Iterator start, const_Iterator end, KeySelector key)
 {
+	// 開始位置と終了位置のイテレーターが所属するリストが異なる場合は処理しない
 	if (start.owner() != this || end.owner() != this) return;
+	// イテレーターがダミーノードを指している場合は処理しない
 	if (start == const_Iterator(&m_Dummy, this) || end == const_Iterator(&m_Dummy, this)) return;
+	// ノードがnullptrの場合、または開始位置と終了位置が同じ場合は処理しない
 	if (!start.m_pCurrent || !end.m_pCurrent || start == end) return;
 
+	// 開始ノードと終了ノードを取得
 	Node* startNode = start.m_pCurrent;
 	Node* endNode = end.m_pCurrent;
 
+	// 開始ノードが終了ノードの次のノードでない限り処理を続行
 	if (startNode != endNode->m_pNextData)
 	{
+		// パーティションを実行し、ピボットの位置を取得
 		Node* pivotNode = _partition(start, end, key).m_pCurrent;
+		// ピボットの前後で再帰的にクイックソートを実行
 		if (pivotNode && pivotNode->m_pPrevData)
 			_quickSort(start, const_Iterator(pivotNode->m_pPrevData, this), key);
 		if (pivotNode && pivotNode->m_pNextData)
