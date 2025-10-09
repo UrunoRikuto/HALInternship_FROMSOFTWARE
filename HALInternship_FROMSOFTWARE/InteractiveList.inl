@@ -5,6 +5,7 @@
 *
 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝*/
 #include "InteractiveList.h"
+#include "File.h"
 
 /***************************************************************
 *	
@@ -246,7 +247,8 @@ template<typename T>
 inline InteractiveList<T>::InteractiveList()
 	:m_Size(0)
 {
-	m_Dummy.m_pNextData = m_Dummy.m_pPrevData = &m_Dummy;
+	m_Dummy.m_pNextData = &m_Dummy;
+	m_Dummy.m_pPrevData = &m_Dummy;
 }
 
 // @brief コピーコンストラクタ
@@ -577,3 +579,238 @@ inline bool InteractiveList<T>::insert(const_Iterator pos, const T& value)
 	m_Size++;
 	return true;
 }
+
+// @brief ノードの入れ替え
+// @param NodeA ノードAのイテレーター
+// @param NodeB ノードBのイテレーター
+template<typename T>
+inline void InteractiveList<T>::swap(const_Iterator NodeA, const_Iterator NodeB)
+{
+	// リストが空の場合は処理しない
+	if (isEmpty()) return;
+
+	// アサートチェック
+	// 所属するリストが異なる場合は処理しない
+	if (NodeA.owner() != this) return;
+	if (NodeB.owner() != this) return;
+	// イテレーターがダミーノードを指している場合は処理しない
+	if (NodeA == const_Iterator(&m_Dummy, this)) return;
+	if (NodeB == const_Iterator(&m_Dummy, this)) return;
+	// 同じノードを指している場合は処理しない
+	if (NodeA == NodeB) return;
+
+	// ノードAとノードBのデータを交換
+	T tempData = NodeA.m_pCurrent->m_Data;
+	NodeA.m_pCurrent->m_Data = NodeB.m_pCurrent->m_Data;
+	NodeB.m_pCurrent->m_Data = tempData;
+}
+
+// @brief ソート
+// @param type ソートアルゴリズム
+// @param order ソート順
+template<typename T>
+template<typename U>
+inline void InteractiveList<T>::sort(SortAlgorithm type, SortOrder order)
+{
+	// リストが空の場合は処理しない
+	if (isEmpty()) return;
+	// 昇順ソートの場合
+	if (order == SortOrder::Ascending)
+	{
+		switch (type)
+		{
+		case SortAlgorithm::QuickSort:
+			_quickSort<U>(cbegin(), cend());
+			break;
+		default:
+			break;
+		}
+	}
+	// 降順ソートの場合
+	else if (order == SortOrder::Descending)
+	{
+		switch (type)
+		{
+		case SortAlgorithm::QuickSort:
+			_quickSort<U>(cbegin(), cend());			
+			break;
+		default:
+			break;
+		}
+
+		// ソート後にリストを反転
+		_reverse();
+	}
+}
+
+// @brief 2つのデータを比較し、aがbより小さいかどうかを判定
+// @param a 比較するデータ1
+// @param b 比較するデータ2
+// @return aがbより小さい場合はtrue,それ以外はfalse
+template<typename T>
+template<typename U>
+inline bool InteractiveList<T>::_isLess(const T& a, const T& b)
+{
+	// 自前構造体の比較
+	if (typeid(T) == typeid(DataParam))
+	{
+		DataParam dataA = *(const DataParam*)(&a);
+		DataParam dataB = *(const DataParam*)(&b);
+
+		if (typeid(U) == typeid(int))
+		{
+			return dataA.m_nScore < dataB.m_nScore;
+		}
+		else if (typeid(U) == typeid(std::string))
+		{
+			const char* strA = dataA.m_Name.c_str();
+			const char* strB = dataB.m_Name.c_str();
+			while (*strA && (*strA == *strB))
+			{
+				++strA;
+				++strB;
+			}
+			return *(const unsigned char*)strA < *(const unsigned char*)strB;
+		}
+	}
+
+	// 型がint,float,doubleの場合のみ比較可能
+	if (typeid(U) == typeid(int) || typeid(U) == typeid(float))
+	{
+		// 型を変換して比較
+		float a = static_cast<float>(*(const float*)(&a));
+		float b = static_cast<float>(*(const float*)(&b));
+		return a < b;
+	}
+	// string や char* の場合は辞書順で比較
+	else if (typeid(U) == typeid(const char*) || typeid(U) == typeid(char*))
+	{
+		const char* a = (const char*)(&a);
+		const char* b = (const char*)(&b);
+		while (*a && (*a == *b))
+		{
+			++a;
+			++b;
+		}
+		return *(const unsigned char*)a < *(const unsigned char*)b;
+	}
+
+	return false;
+}
+
+// @brief パーティション
+// @param start パーティションの開始イテレーター
+// @param end パーティションの終了イテレーター
+// @return ピボットの位置のイテレーター
+template<typename T>
+template<typename U>
+inline typename InteractiveList<T>::const_Iterator InteractiveList<T>::_partition(const_Iterator start, const_Iterator end)
+{
+	// ピボットを設定
+	T pivot = (*end);
+
+	// 開始のノードを取得
+	Node* startNode = start.m_pCurrent;
+	// 終了のノードを取得
+	Node* endNode = end.m_pCurrent;
+
+	// iをstartの前のノードに設定
+	Node* i = startNode->m_pPrevData;
+
+	// jをstartからendまでループ
+	for (Node* j = startNode; j != endNode; j = j->m_pNextData)
+	{
+		// ピボットより小さい場合
+		if (_isLess<U>(j->m_Data, pivot))
+		{
+			i = (i == nullptr) ? startNode : i->m_pNextData;
+			swap(const_Iterator(i, this), const_Iterator(j, this));
+		}
+	}
+
+	i = (i == nullptr) ? startNode : i->m_pNextData;
+	swap(const_Iterator(i, this), end);
+
+	return const_Iterator(i, this);
+}
+
+// @brief クイックソート
+// @param start ソートの開始イテレーター
+// @param end ソートの終了イテレーター
+template<typename T>
+template<typename U>
+inline void InteractiveList<T>::_quickSort(const_Iterator start, const_Iterator end)
+{
+	// 所属するリストが異なる場合は処理しない
+	if (start.owner() != this)return;
+	if (end.owner() != this)return;
+	// イテレーターがダミーノードを指している場合は処理しない
+	if (start == const_Iterator(&m_Dummy, this)) return;
+	if (end == const_Iterator(&m_Dummy, this)) return;
+	if (!start.m_pCurrent)return;
+	if (!end.m_pCurrent)return;
+	// 同じノードを指している場合は処理しない
+	if (start == end)return;
+
+	// 開始イテレーターのノードを取得
+	Node* startNode = start.m_pCurrent;
+	// 終了イテレーターのノードを取得
+	Node* endNode = end.m_pCurrent;
+
+	// 開始ノードが終了ノードの次のノードでない場合
+	if (startNode != endNode->m_pNextData)
+	{
+		Node* pivotNode = _partition<U>(start, end).m_pCurrent;
+		// ピボットの前のノードが存在する場合、ピボットの前までソート
+		if (pivotNode && pivotNode->m_pPrevData)
+		{
+			_quickSort<U>(start, const_Iterator(pivotNode->m_pPrevData, this));
+		}
+		// ピボットの次のノードが存在する場合、ピボットの次からソート
+		if (pivotNode && pivotNode->m_pNextData)
+		{
+			_quickSort<U>(const_Iterator(pivotNode->m_pNextData, this), end);
+		}
+	}
+}
+
+// @brief リストを反転
+template<typename T>
+inline void InteractiveList<T>::_reverse()
+{
+	// リストが空の場合は処理しない
+	if (isEmpty()) return;
+	Node* current = m_Dummy.m_pNextData;
+	Node* temp = nullptr;
+	// ノードを反転
+	while (current != &m_Dummy)
+	{
+		// 前後のノードを入れ替え
+		temp = current->m_pPrevData;
+		current->m_pPrevData = current->m_pNextData;
+		current->m_pNextData = temp;
+		// 次のノードへ移動
+		current = current->m_pPrevData;
+	}
+	// 先頭と末尾を入れ替え
+	if (temp != nullptr)
+	{
+		m_Dummy.m_pPrevData = m_Dummy.m_pNextData;
+		m_Dummy.m_pNextData = temp->m_pPrevData;
+	}
+}
+
+/***************************************************************
+*
+* ソートプログラムの実装
+* 
+* 参考にしているサイト
+* https://www.geeksforgeeks.org/dsa/cpp-program-for-quicksort-on-doubly-linked-list/
+* https://stackoverflow.com/questions/1382273/sorting-a-doubly-linked-list-c
+* 
+* TODO:
+* |v|Swap関数
+* | |Partition関数
+* | |QuickSort関数
+*
+***************************************************************/

@@ -199,13 +199,59 @@ public:
 
 	// @brief 要素の削除
 	// @param pos 削除する要素のイテレーター
+	// @return 削除に成功したらtrue,失敗したらfalse
 	bool erase(const_Iterator pos);
 
 	// @brief 要素の挿入
 	// @param pos 挿入する位置のイテレーター
 	// @param value 挿入するデータ
+	// @return 挿入に成功したらtrue,失敗したらfalse
 	bool insert(const_Iterator pos, const T& value);
 	
+	// @brief ノードのデータを交換
+	// @param NodeA 交換するノードAのイテレーター
+	// @param NodeB 交換するノードBのイテレーター
+	void swap(const_Iterator NodeA, const_Iterator NodeB);
+
+public:
+	// @brief ソートの順序
+	enum class SortOrder
+	{
+		Ascending,	// 昇順
+		Descending, // 降順
+	};
+	// @brief ソートアルゴリズムの種類
+	enum class SortAlgorithm
+	{
+		QuickSort,	// クイックソート
+	};
+	// @brief リストをソート
+	template<typename U>
+	void sort(SortAlgorithm type, SortOrder order);
+private:
+
+	// @brief 2つのデータを比較し、aがbより小さいかどうかを判定
+	// @param a 比較するデータ
+	// @param b 比較するデータ
+	// @return aがbより小さい場合true,そうでない場合false
+	template<typename U>
+	bool _isLess(const T& a, const T& b);
+
+	// @brief ピポット値を基準にリストのノードを左右に分割する
+	// @param start パーティションの開始イテレーター
+	// @param end パーティションの終了イテレーター
+	// @return 新しいピボットのイテレーター
+	template<typename U>
+	const_Iterator _partition(const_Iterator start, const_Iterator end);
+
+	// @brief クイックソートの実装
+	// @param start ソートする範囲の開始イテレーター
+	// @param end ソートする範囲の終了イテレーター
+	template<typename U>
+	void _quickSort(const_Iterator start, const_Iterator end);
+
+	// @brief リストを反転
+	void _reverse();
 private:
 	// @brief ダミーノード
 	Node m_Dummy;

@@ -17,6 +17,9 @@ int main(void)
 		std::cout << "ファイルの読み込みに失敗しました。" << std::endl;
 	}
 
+	// リストのソート
+	list.sort<int>(InteractiveList<DataParam>::SortAlgorithm::QuickSort, InteractiveList<DataParam>::SortOrder::Ascending);
+
 	// リストの内容を表示
 	// イテレーターを使ってリストの各要素にアクセス
 	for (const auto& data : list)
@@ -27,8 +30,6 @@ int main(void)
 			"Name: " << data.m_Name 
 			<< std::endl;
 	}
-
-	list.clear();
 
 	// プログラム終了
 	return 0;
