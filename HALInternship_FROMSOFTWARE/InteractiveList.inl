@@ -621,7 +621,7 @@ inline void InteractiveList<T>::swap(const_Iterator NodeA, const_Iterator NodeB)
 // @param order ソート順
 // @param key ソートキーを取得する関数オブジェクト
 template<typename T>
-template<typename KeySelector>
+template<typename KeySelector, typename SortOrder>
 inline void InteractiveList<T>::sort(SortAlgorithm type, SortOrder order, KeySelector key)
 {
 	// リストが空の場合は処理しない
@@ -632,31 +632,11 @@ inline void InteractiveList<T>::sort(SortAlgorithm type, SortOrder order, KeySel
 	{
 	case SortAlgorithm::QuickSort:
 		// クイックソートを実行
-		_quickSort(cbegin(), cend(), key);
+		_quickSort(cbegin(), cend(), order, key);
 		break;
 	default:
 		break;
 	}
-
-	// 降順の場合はリストを反転
-	if (order == SortOrder::Descending)
-	{
-		// リストを反転
-		_reverse();
-	}
-}
-
-// @brief 2つのデータを比較し、aがbより小さいかどうかを判定
-// @param a 比較するデータ1
-// @param b 比較するデータ2
-// @param key 比較キーを取得する関数オブジェクト
-// @return aがbより小さい場合はtrue,そうでなければfalse
-template<typename T>
-template<typename KeySelector>
-inline constexpr auto InteractiveList<T>::_isLess(const T& a, const T& b, KeySelector key)
--> decltype(key(a) < key(b), bool())
-{
-	return key(a) < key(b);
 }
 
 // @brief パーティション
@@ -665,8 +645,8 @@ inline constexpr auto InteractiveList<T>::_isLess(const T& a, const T& b, KeySel
 // @param key ソートキーを取得する関数オブジェクト
 // @return ピボットの位置のイテレーター
 template<typename T>
-template<typename KeySelector>
-inline typename InteractiveList<T>::const_Iterator InteractiveList<T>::_partition(const_Iterator start, const_Iterator end, KeySelector key)
+template<typename KeySelector, typename SortOrder>
+inline typename InteractiveList<T>::const_Iterator InteractiveList<T>::_partition(const_Iterator start, const_Iterator end, SortOrder order, KeySelector key)
 {
 	// ピボットを取得
 	T pivot = (*end);
@@ -681,7 +661,7 @@ inline typename InteractiveList<T>::const_Iterator InteractiveList<T>::_partitio
 	for (Node* j = startNode; j != endNode; j = j->m_pNextData)
 	{
 		// jのデータがピボットより小さい場合
-		if (_isLess(j->m_Data, pivot, key))
+		if (order(key(j->m_Data), key(pivot)))
 		{
 			// iを1つ進める
 			i = (i == nullptr) ? startNode : i->m_pNextData;
@@ -702,8 +682,8 @@ inline typename InteractiveList<T>::const_Iterator InteractiveList<T>::_partitio
 // @param end ソートの終了イテレーター
 // @param key ソートキーを取得する関数オブジェクト
 template<typename T>
-template<typename KeySelector>
-inline void InteractiveList<T>::_quickSort(const_Iterator start, const_Iterator end, KeySelector key)
+template<typename KeySelector, typename SortOrder>
+inline void InteractiveList<T>::_quickSort(const_Iterator start, const_Iterator end, SortOrder order, KeySelector key)
 {
 	// 開始位置と終了位置のイテレーターが所属するリストが異なる場合は処理しない
 	if (start.owner() != this || end.owner() != this) return;
@@ -720,34 +700,11 @@ inline void InteractiveList<T>::_quickSort(const_Iterator start, const_Iterator 
 	if (startNode != endNode->m_pNextData)
 	{
 		// パーティションを実行し、ピボットの位置を取得
-		Node* pivotNode = _partition(start, end, key).m_pCurrent;
+		Node* pivotNode = _partition(start, end, order, key).m_pCurrent;
 		// ピボットの前後で再帰的にクイックソートを実行
 		if (pivotNode && pivotNode->m_pPrevData)
-			_quickSort(start, const_Iterator(pivotNode->m_pPrevData, this), key);
+			_quickSort(start, const_Iterator(pivotNode->m_pPrevData, this), order, key);
 		if (pivotNode && pivotNode->m_pNextData)
-			_quickSort(const_Iterator(pivotNode->m_pNextData, this), end, key);
+			_quickSort(const_Iterator(pivotNode->m_pNextData, this), end, order, key);
 	}
-}
-
-// @brief リストを反転
-template<typename T>
-inline void InteractiveList<T>::_reverse()
-{
-	// リストが空の場合は処理しない
-	if (isEmpty()) return;
-
-	// 先頭イテレーターと末尾イテレーターを取得
-	Iterator left = begin();
-	Iterator right = end();
-	// leftがrightの前のノードでない限り処理を続行
-	while (left.m_pCurrent != right.m_pCurrent && left.m_pCurrent != right.m_pCurrent->m_pNextData)
-	{
-		// leftとrightのデータを交換
-		swap(left, right);
-		// leftを1つ進める
-		++left;
-		// rightを1つ戻す
-		--right;
-	}
-
 }

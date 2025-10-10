@@ -9,11 +9,11 @@
 #include <cassert>
 
 // @brief ソートの順序
-enum class SortOrder
-{
-	Ascending,	// 昇順
-	Descending, // 降順
-};
+//enum class SortOrder
+//{
+//	Ascending,	// 昇順
+//	Descending, // 降順
+//};
 // @brief ソートアルゴリズムの種類
 enum class SortAlgorithm
 {
@@ -230,36 +230,27 @@ public:
 	// @param type ソートアルゴリズム
 	// @param order ソート順
 	// @param key ソートキーを取得する関数オブジェクト
-	template<typename KeySelector>
+	template<typename KeySelector, typename SortOrder>
 	 void sort(SortAlgorithm type, SortOrder order, KeySelector key);
 	 // @brief リストをソート(キーがnullptrの場合のオーバーロード)
+	 template<typename SortOrder>
 	 void sort(SortAlgorithm type, SortOrder order, std::nullptr_t key) { return; }
 private:
-
-	// @brief 2つのデータを比較し、aがbより小さいかどうかを判定
-	// @param a 比較するデータ
-	// @param b 比較するデータ
-	// @param key 比較キーを取得する関数オブジェクト
-	// @return aがbより小さい場合true,そうでない場合false
-	template<typename KeySelector>
-	constexpr auto _isLess(const T& a, const T& b, KeySelector key) -> decltype(key(a) < key(b), bool());
 
 	// @brief ピポット値を基準にリストのノードを左右に分割する
 	// @param start パーティションの開始イテレーター
 	// @param end パーティションの終了イテレーター
 	// @param key 比較キーを取得する関数オブジェクト
 	// @return 新しいピボットのイテレーター
-	template<typename KeySelector>
-	const_Iterator _partition(const_Iterator start, const_Iterator end, KeySelector key);
+	template<typename KeySelector, typename SortOrder>
+	const_Iterator _partition(const_Iterator start, const_Iterator end, SortOrder order, KeySelector key);
 
 	// @brief クイックソートの実装
 	// @param start ソートする範囲の開始イテレーター
 	// @param end ソートする範囲の終了イテレーター
-	template<typename KeySelector>
-	void _quickSort(const_Iterator start, const_Iterator end, KeySelector key);
+	template<typename KeySelector, typename SortOrder>
+	void _quickSort(const_Iterator start, const_Iterator end, SortOrder order, KeySelector key);
 
-	// @brief リストを反転
-	void _reverse();
 private:
 	// @brief ダミーノード
 	Node m_Dummy;

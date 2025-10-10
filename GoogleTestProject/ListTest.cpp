@@ -816,7 +816,7 @@ namespace List
 		// リストを作成
 		InteractiveList<int> list;
 		// クイックソートを実行
-		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+		list.sort(SortAlgorithm::QuickSort, std::less<>(),
 			[](const int& d) {return d; });
 
 		EXPECT_EQ(list.getSize(), 0);
@@ -830,7 +830,7 @@ namespace List
 		// リストにデータを挿入
 		list.pushBack(1);
 		// クイックソートを実行
-		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+		list.sort(SortAlgorithm::QuickSort, std::less<>(),
 			[](const int& d) {return d; });
 
 		// 先頭イテレーターを取得
@@ -849,7 +849,7 @@ namespace List
 		list.pushBack(1);
 		list.pushBack(2);
 		// クイックソートを実行
-		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+		list.sort(SortAlgorithm::QuickSort, std::less<>(),
 			[](const int& d) {return d; });
 		// 先頭イテレーターを取得
 		InteractiveList<int>::Iterator it = list.begin();
@@ -874,7 +874,7 @@ namespace List
 		list.pushBack(2);
 		list.pushBack(1);
 		// クイックソートを実行
-		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+		list.sort(SortAlgorithm::QuickSort, std::less<>(),
 			[](const int& d) {return d; });
 		// 先頭イテレーターを取得
 		InteractiveList<int>::Iterator it = list.begin();
@@ -905,7 +905,7 @@ namespace List
 		list.pushBack(3);
 		list.pushBack(3);
 		// クイックソートを実行
-		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+		list.sort(SortAlgorithm::QuickSort, std::less<>(),
 			[](const int& d) {return d; });
 		// 先頭イテレーターを取得
 		InteractiveList<int>::Iterator it = list.begin();
@@ -948,7 +948,7 @@ namespace List
 		it++;
 		list.insert(it, 5);//3と3の間に5を挿入
 		// クイックソートを実行
-		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+		list.sort(SortAlgorithm::QuickSort, std::less<>(),
 			[](const int& d) {return d; });
 		// 先頭イテレーターを再取得
 		it = list.begin();
@@ -982,7 +982,7 @@ namespace List
 		list.pushBack(1);
 		list.pushBack(2);
 		// クイックソートを実行
-		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending, nullptr);
+		list.sort(SortAlgorithm::QuickSort, std::less<>(), nullptr);
 		// 先頭イテレーターを取得
 		InteractiveList<int>::Iterator it = list.begin();
 		// データが3,1,2の順であることを確認
@@ -1004,7 +1004,7 @@ namespace List
 		list.pushBack(1);
 		list.pushBack(2);
 		// クイックソートを実行
-		list.sort(SortAlgorithm::QuickSort, SortOrder::Ascending,
+		list.sort(SortAlgorithm::QuickSort, std::less<>(),
 			[](const std::string& d) {return d; });//ここでエラー
 #endif //TT_TEST_QUICK_SORT_WHEN_INVALID_KEY
 		SUCCEED();
@@ -1017,7 +1017,7 @@ namespace List
 		// const版リストを作成
 		const InteractiveList<int> list;
 		// クイックソートを実行
-		list.sort(InteractiveList<int>::SortAlgorithm::QuickSort, InteractiveList<int>::SortOrder::Ascending,
+		list.sort(SortAlgorithm::QuickSort, std::less<>(),
 			[](const int& d) {return d; });
 #endif //TT_TEST_QUICK_SORT_WHEN_CONST
 		SUCCEED();
